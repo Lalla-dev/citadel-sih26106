@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citadel Forensic Dossier // {{ result.case_id }}</title>
+  <style>
+    :root {
+      --bg-dark: #0a0e17;
+      --bg-card: #111827;
+      --bg-card-alt: #162032;
+      --border-color: #1f293d;
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --color-critical: #ef4444;
+      --color-high: #f97316;
+      --color-medium: #eab308;
+      --color-low: #10b981;
+      --accent-blue: #38bdf8;
+      --accent-indigo: #818cf8;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.5;
+      padding: 30px;
+      font-size: 13px;
+    }
+
+    .dossier-container {
+      max-width: 1080px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Action Bar (Screen Only) */
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #06090e;
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .action-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    .action-bar-right {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-action {
+      background: #1f293d;
+      color: var(--text-primary);
+      border: 1px solid #374151;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-action:hover {
+      background: var(--accent-blue);
+      color: #000;
+      border-color: var(--accent-blue);
+    }
+    .btn-primary-action {
+      background: var(--accent-blue);
+      color: #0a0e17;
+      border-color: var(--accent-blue);
+    }
+    .btn-primary-action:hover {
+      background: #7dd3fc;
+    }
+
+    /* Header Banner */
+    .dossier-header {
+      padding: 24px 30px;
+      background: linear-gradient(135deg, #0b1329 0%, #151d38 100%);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .header-branding h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-branding h1 span { color: var(--accent-blue); }
+    .header-subtitle {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    .header-case-badge {
+      text-align: right;
+    }
+    .case-id-tag {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--accent-blue);
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 4px 12px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    .classification-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--color-critical);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 5px;
+    }
+
+    /* Content Layout */
+    .dossier-body {
+      padding: 24px 30px;
+    }
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 24px 0 12px 0;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .section-title:first-of-type { margin-top: 0; }
+
+    /* Key Metrics Bar */
+    .metrics-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1.5fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .metric-card {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 16px;
+    }
+    .metric-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .metric-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+    .metric-sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .risk-critical { color: var(--color-critical); }
+    .risk-high { color: var(--color-high); }
+    .risk-medium { color: var(--color-medium); }
+    .risk-low { color: var(--color-low); }
+
+    /* Executive Callout */
+    .exec-summary-box {
+      background: rgba(17, 24, 39, 0.8);
+      border-left: 4px solid var(--accent-blue);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 20px;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    /* Key-Value Tables */
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin-bottom: 16px;
+    }
+    .info-table th, .info-table td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .info-table th {
+      color: var(--text-secondary);
+      font-weight: 600;
+      width: 22%;
+      background: var(--bg-card-alt);
+    }
+    .info-table td {
+      color: var(--text-primary);
+      word-break: break-all;
+    }
+    .code-val {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--accent-blue);
+    }
+
+    /* Callout Alert */
+    .disclaimer-alert {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+    .disclaimer-alert strong { color: #fef3c7; }
+
+    /* Data Grids */
+    .two-col-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .data-box {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .data-box-title {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Badges */
+    .badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+    .badge-pass { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-fail { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-warn { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-none { background: rgba(107, 114, 128, 0.15); color: #9ca3af; border: 1px solid rgba(107, 114, 128, 0.3); }
+
+    /* Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      margin-bottom: 14px;
+    }
+    .data-table th {
+      background: #0d1322;
+      color: var(--text-secondary);
+      font-weight: 700;
+      padding: 8px 10px;
+      text-align: left;
+      border: 1px solid var(--border-color);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .data-table td {
+      padding: 8px 10px;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      word-break: break-all;
+    }
+    .data-table tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    /* Integrity Box */
+    .integrity-container {
+      background: #070a10;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .integrity-status-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1a2538;
+    }
+    .integrity-hash-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.75rem;
+    }
+    .hash-item {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+    .hash-label {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    .hash-code {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent-blue);
+      background: #020408;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #141c2c;
+      word-break: break-all;
+    }
+
+    /* Actions List */
+    .action-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .action-item {
+      background: rgba(56, 189, 248, 0.04);
+      border-left: 3px solid var(--accent-blue);
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      border-radius: 0 4px 4px 0;
+    }
+
+    /* Reasons List */
+    .reason-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .reason-item {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+    .reason-desc { color: var(--text-primary); }
+    .reason-points {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--color-high);
+      font-size: 0.75rem;
+    }
+
+    /* Footer */
+    .dossier-footer {
+      padding: 20px 30px;
+      background: #06090e;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* Print Stylesheet */
+    @media print {
+      body {
+        background: #fff;
+        color: #000;
+        padding: 0;
+        font-size: 11px;
+      }
+      .action-bar { display: none; }
+      .dossier-container {
+        border: none;
+        box-shadow: none;
+        max-width: 100%;
+        background: #fff;
+      }
+      .dossier-header {
+        background: #f3f4f6;
+        border-bottom: 2px solid #111;
+        padding: 16px;
+      }
+      .header-branding h1 { color: #000; }
+      .header-branding h1 span { color: #0284c7; }
+      .dossier-body { padding: 16px; }
+      .section-title {
+        color: #0284c7;
+        border-bottom: 1px solid #ccc;
+      }
+      .metric-card, .data-box, .integrity-container {
+        background: #f9fafb;
+        border: 1px solid #ddd;
+        color: #000;
+      }
+      .metric-value { color: #000; }
+      .info-table th { background: #f3f4f6; color: #333; }
+      .info-table td { color: #111; }
+      .data-table th { background: #e5e7eb; color: #111; border-color: #ccc; }
+      .data-table td { border-color: #ccc; color: #111; }
+      .hash-code { background: #f3f4f6; color: #0284c7; border-color: #ddd; }
+      .disclaimer-alert { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
+      .exec-summary-box { background: #f0fdf4; border-left-color: #0284c7; color: #000; }
+      .reason-item { background: #f9fafb; border-color: #ddd; color: #000; }
+      .action-item { background: #f0f9ff; border-left-color: #0284c7; color: #000; }
+      .dossier-footer { background: #f3f4f6; border-top: 1px solid #ccc; color: #555; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="dossier-container">
+
+  <!-- Screen Action Bar -->
+  <div class="action-bar">
+    <div class="action-bar-left">
+      <span>🛡️ <strong>Citadel Security Operations</strong></span>
+      <span>•</span>
+      <span>Official Forensic Dossier</span>
+      <span>•</span>
+      <span>Case ID: {{ result.case_id }}</span>
+    </div>
+    <div class="action-bar-right">
+      <button onclick="window.print()" class="btn-action btn-primary-action">
+        🖨️ Print / Save PDF
+      </button>
+      <a href="/api/case/{{ result.case_id }}/report/json" class="btn-action" target="_blank">
+        📥 SIEM JSON Export
+      </a>
+      <button onclick="window.close()" class="btn-action">
+        ✕ Close
+      </button>
+    </div>
+  </div>
+
+  <!-- Dossier Header -->
+  <header class="dossier-header">
+    <div class="header-branding">
+      <h1>CITADEL <span>//</span> FORENSIC INCIDENT DOSSIER</h1>
+      <div class="header-subtitle">Automated Email Security Intelligence &amp; Digital Evidence Analysis</div>
+    </div>
+    <div class="header-case-badge">
+      <div class="case-id-tag">{{ result.case_id }}</div>
+      <div class="classification-tag">CONFIDENTIAL // INCIDENT EVIDENCE</div>
+    </div>
+  </header>
+
+  <div class="dossier-body">
+
+    <!-- 1. Key Metrics & Overview -->
+    <div class="metrics-bar">
+      <div class="metric-card">
+        <div class="metric-label">Threat Score</div>
+        <div class="metric-value {% if result.threat_score >= 80 %}risk-critical{% elif result.threat_score >= 60 %}risk-high{% elif result.threat_score >= 30 %}risk-medium{% else %}risk-low{% endif %}">
+          {{ result.threat_score }}/100
+        </div>
+        <div class="metric-sub">{{ result.risk_level }} SEVERITY</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Threat Archetype</div>
+        <div class="metric-value" style="font-size: 1.05rem; font-weight: 700; line-height: 1.3; margin-top: 5px;">
+          {{ result.threat_archetype }}
+        </div>
+        <div class="metric-sub">Primary Classification</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Analysis Confidence</div>
+        <div class="metric-value" style="color: var(--accent-blue);">
+          {{ "%.0f"|format(result.confidence * 100) }}%
+        </div>
+        <div class="metric-sub">{{ result.confidence_label }}</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Chain-of-Custody Timestamp</div>
+        <div class="metric-value code-val" style="font-size: 0.85rem; margin-top: 6px;">
+          {{ result.timestamp }}
+        </div>
+        <div class="metric-sub">RFC 3339 / UTC Standard</div>
+      </div>
+    </div>
+
+    <!-- 2. Executive Summary -->
+    <h2 class="section-title">1. Executive Summary</h2>
+    <div class="exec-summary-box">
+      <strong>Incident Overview:</strong>
+      {{ executive_summary }}
+    </div>
+
+    <!-- 3. RFC 5322 Email Metadata -->
+    <h2 class="section-title">2. RFC 5322 Email Forensics &amp; Routing</h2>
+    <table class="info-table">
+      <tbody>
+        <tr>
+          <th>Subject</th>
+          <td><strong>{{ result.metadata.subject or "(No Subject)" }}</strong></td>
+        </tr>
+        <tr>
+          <th>Sender (From)</th>
+          <td>
+            {% if result.metadata.sender_display_name %}
+              {{ result.metadata.sender_display_name }} &lt;<span class="code-val">{{ result.metadata.sender_email }}</span>&gt;
+            {% else %}
+              <span class="code-val">{{ result.metadata.sender_email or "-" }}</span>
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <th>Recipient (To)</th>
+          <td><span class="code-val">{{ result.metadata.recipient or "-" }}</span></td>
+        </tr>
+        <tr>
+          <th>Reply-To</th>
+          <td><span class="code-val">{{ result.metadata.reply_to or "(Not Specified)" }}</span></td>
+        </tr>
+        <tr>
+          <th>Return-Path</th>
+          <td><span class="code-val">{{ result.metadata.return_path or "(Not Specified)" }}</span></td>
+        </tr>
+        <tr>
+          <th>Message Date</th>
+          <td>{{ result.metadata.date or "-" }}</td>
+        </tr>
+        <tr>
+          <th>Message-ID</th>
+          <td><span class="code-val">{{ result.metadata.message_id or "-" }}</span></td>
+        </tr>
+        <tr>
+          <th>Input Payload File</th>
+          <td>{{ result.filename }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 4. Protocol Authentication Analysis -->
+    <h2 class="section-title">3. Protocol Authentication &amp; Identity Spoofing Analysis</h2>
+    <div class="disclaimer-alert">
+      ⚠️ <strong>Notice on Authentication Verification:</strong> SPF, DKIM, and DMARC statuses are extracted directly from message headers (e.g. <code>Received-SPF</code> / <code>Authentication-Results</code>). They represent <strong>static header parsing only</strong> and are <strong>not</strong> independently verified via live DNS query.
+    </div>
+
+    <div class="two-col-grid">
+      <div class="data-box">
+        <div class="data-box-title">
+          <span>Protocol Security Status</span>
+        </div>
+        <table class="info-table" style="margin-bottom: 0;">
+          <tbody>
+            <tr>
+              <th style="width: 40%;">SPF (Parsed)</th>
+              <td>
+                <span class="badge {% if result.authentication.spf.status == 'pass' %}badge-pass{% elif result.authentication.spf.status in ['fail', 'softfail'] %}badge-fail{% else %}badge-none{% endif %}">
+                  {{ result.authentication.spf.status|upper }}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>DKIM (Parsed)</th>
+              <td>
+                <span class="badge {% if result.authentication.dkim.status == 'pass' %}badge-pass{% elif result.authentication.dkim.status == 'fail' %}badge-fail{% else %}badge-none{% endif %}">
+                  {{ result.authentication.dkim.status|upper }}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>DMARC (Parsed)</th>
+              <td>
+                <span class="badge {% if result.authentication.dmarc.status == 'pass' %}badge-pass{% elif result.authentication.dmarc.status == 'fail' %}badge-fail{% else %}badge-none{% endif %}">
+                  {{ result.authentication.dmarc.status|upper }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="data-box">
+        <div class="data-box-title">
+          <span>Routing &amp; Envelope Alignment</span>
+        </div>
+        <table class="info-table" style="margin-bottom: 0;">
+          <tbody>
+            <tr>
+              <th style="width: 50%;">Reply-To Mismatch</th>
+              <td>
+                <span class="badge {% if result.authentication.reply_to_mismatch %}badge-fail{% else %}badge-pass{% endif %}">
+                  {{ "DETECTED" if result.authentication.reply_to_mismatch else "ALIGNED" }}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>Display Name Spoofing</th>
+              <td>
+                <span class="badge {% if result.authentication.display_name_spoofed %}badge-fail{% else %}badge-pass{% endif %}">
+                  {{ "DETECTED" if result.authentication.display_name_spoofed else "CLEAN" }}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>Envelope-From Mismatch</th>
+              <td>
+                <span class="badge {% if result.authentication.envelope_from_mismatch %}badge-fail{% else %}badge-pass{% endif %}">
+                  {{ "MISMATCH" if result.authentication.envelope_from_mismatch else "ALIGNED" }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 5. URL & Structural IOC Analysis -->
+    <h2 class="section-title">4. Extracted URLs &amp; Structural IOC Intelligence</h2>
+    {% if result.urls and result.urls|length > 0 %}
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 32%;">Target URL</th>
+            <th style="width: 18%;">Domain</th>
+            <th style="width: 12%;">Entropy</th>
+            <th style="width: 26%;">Suspicious Indicators</th>
+            <th style="width: 12%;">Risk</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in result.urls %}
+            <tr>
+              <td class="code-val" style="font-size: 0.72rem;">{{ u.url }}</td>
+              <td><strong>{{ u.domain }}</strong></td>
+              <td>{{ "%.2f"|format(u.shannon_entropy) }}</td>
+              <td>
+                {% set flags = [] %}
+                {% if u.is_ip_address %}{% set _ = flags.append("Raw IP Host") %}{% endif %}
+                {% if u.has_brand_keywords %}{% set _ = flags.append("Brand Keyword: " ~ u.brand_impersonated) %}{% endif %}
+                {% if u.excessive_subdomains %}{% set _ = flags.append("Subdomain Depth: " ~ u.subdomain_count) %}{% endif %}
+                {% if u.punycode_detected %}{% set _ = flags.append("Punycode/IDN") %}{% endif %}
+                {% if u.obfuscated_encoding %}{% set _ = flags.append("Obfuscated Encoding") %}{% endif %}
+                {% if flags|length > 0 %}
+                  {{ flags|join(", ") }}
+                {% else %}
+                  <span style="color: var(--text-muted);">Standard syntax</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge {% if u.risk_level in ['HIGH', 'CRITICAL'] %}badge-fail{% elif u.risk_level == 'MEDIUM' %}badge-warn{% else %}badge-pass{% endif %}">
+                  {{ u.risk_level }}
+                </span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="data-box" style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 14px;">
+        No embedded hyperlinks detected in email payload.
+      </div>
+    {% endif %}
+
+    <!-- 6. ML & Contextual NLP Analysis -->
+    <h2 class="section-title">5. Machine Learning &amp; Contextual Pretexting Radar</h2>
+    <div class="two-col-grid">
+      <!-- ML Card -->
+      <div class="data-box">
+        <div class="data-box-title">
+          <span>TF-IDF + Logistic Regression Classifier</span>
+          <span class="badge {% if result.ml_classification.predicted_label in ['phishing', 'bec'] %}badge-fail{% else %}badge-pass{% endif %}">
+            {{ result.ml_classification.predicted_label|upper }}
+          </span>
+        </div>
+        <table class="info-table" style="margin-bottom: 0;">
+          <tbody>
+            <tr>
+              <th style="width: 45%;">Predicted Label</th>
+              <td><strong>{{ result.ml_classification.predicted_label|upper }}</strong></td>
+            </tr>
+            <tr>
+              <th>ML Model Confidence</th>
+              <td>{{ "%.1f"|format(result.ml_classification.ml_confidence * 100) }}%</td>
+            </tr>
+            <tr>
+              <th>Phishing Probability</th>
+              <td class="code-val">{{ "%.1f"|format(result.ml_classification.probabilities.get('phishing', 0) * 100) }}%</td>
+            </tr>
+            <tr>
+              <th>BEC Probability</th>
+              <td class="code-val">{{ "%.1f"|format(result.ml_classification.probabilities.get('bec', 0) * 100) }}%</td>
+            </tr>
+            <tr>
+              <th>Benign Probability</th>
+              <td class="code-val">{{ "%.1f"|format(result.ml_classification.probabilities.get('benign', 0) * 100) }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Contextual NLP Card -->
+      <div class="data-box">
+        <div class="data-box-title">
+          <span>Semantic Pretexting &amp; Psychological Coercion</span>
+          <span class="badge {% if result.nlp_analysis.coercion_score >= 0.6 %}badge-fail{% elif result.nlp_analysis.coercion_score >= 0.3 %}badge-warn{% else %}badge-pass{% endif %}">
+            Index: {{ "%.2f"|format(result.nlp_analysis.coercion_score) }}
+          </span>
+        </div>
+        <table class="info-table" style="margin-bottom: 0;">
+          <tbody>
+            <tr>
+              <th style="width: 45%;">Semantic Archetype</th>
+              <td><strong>{{ result.nlp_analysis.dominant_archetype }}</strong></td>
+            </tr>
+            <tr>
+              <th>Detected Tone</th>
+              <td><span class="code-val">{{ result.nlp_analysis.tone }}</span></td>
+            </tr>
+            <tr>
+              <th>Psychological Coercion</th>
+              <td>
+                {% if result.nlp_analysis.coercion_score >= 0.6 %}
+                  <strong style="color: var(--color-critical);">CRITICAL (Severe Pressure/Urgency)</strong>
+                {% elif result.nlp_analysis.coercion_score >= 0.3 %}
+                  <strong style="color: var(--color-high);">ELEVATED</strong>
+                {% else %}
+                  <span style="color: var(--color-low);">LOW / NORMAL</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th>BEC Intent Signals</th>
+              <td>
+                {% set intents = [] %}
+                {% if result.intent.financial_transaction %}{% set _ = intents.append("Financial Wire") %}{% endif %}
+                {% if result.intent.urgency_deadline %}{% set _ = intents.append("Urgency Deadline") %}{% endif %}
+                {% if result.intent.authority_impersonation %}{% set _ = intents.append("Authority Pretext") %}{% endif %}
+                {{ intents|join(", ") if intents|length > 0 else "None detected" }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 7. Threat Intelligence & Geolocation -->
+    <h2 class="section-title">6. Threat Intelligence &amp; Infrastructure Profiling</h2>
+    <div class="disclaimer-alert" style="background: rgba(56, 189, 248, 0.08); border-color: rgba(56, 189, 248, 0.3); color: var(--accent-blue);">
+      ℹ️ <strong>Intelligence Source Note:</strong> Threat intelligence feeds, IP geolocation records, and adversary syndicate attributions shown below originate from <strong>Citadel Curated Threat Intelligence</strong> and offline ASN databases.
+    </div>
+
+    {% if result.enrichment and result.enrichment.get("indicators") %}
+      {% set ioc = result.enrichment.indicators %}
+      {% if ioc.threat_actor and ioc.threat_actor != "Unknown / Unattributed" %}
+        <div class="data-box" style="border-left: 4px solid var(--color-critical); margin-bottom: 14px;">
+          <div class="data-box-title" style="color: var(--color-critical);">
+            <span>⚡ Threat Actor Attribution (Curated Feed)</span>
+            <span class="badge badge-fail">{{ ioc.threat_actor }}</span>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-primary);">
+            Associated with syndicate <strong>{{ ioc.threat_actor }}</strong>. Known for automated credential harvesting and executive BEC diversion.
+          </p>
+        </div>
+      {% endif %}
+
+      <div class="two-col-grid">
+        <div class="data-box">
+          <div class="data-box-title"><span>Network Geolocation &amp; ASN</span></div>
+          <table class="info-table" style="margin-bottom: 0;">
+            <tbody>
+              {% if result.enrichment.get("resolved_ips") and result.enrichment.resolved_ips|length > 0 %}
+                {% set ip_info = result.enrichment.resolved_ips[0] %}
+                <tr><th>Resolved IP</th><td class="code-val">{{ ip_info.ip }}</td></tr>
+                <tr><th>Location</th><td>{{ ip_info.city }}, {{ ip_info.country }}</td></tr>
+                <tr><th>ASN &amp; Org</th><td>{{ ip_info.asn }} — {{ ip_info.org }}</td></tr>
+                <tr><th>Infrastructure Risk</th><td>{{ ip_info.notes }}</td></tr>
+              {% else %}
+                <tr><td colspan="2" style="color: var(--text-muted);">No external IP infrastructure resolved.</td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="data-box">
+          <div class="data-box-title"><span>Domain Reputation &amp; TLD Analysis</span></div>
+          <table class="info-table" style="margin-bottom: 0;">
+            <tbody>
+              {% if result.enrichment.get("domain_analysis") and result.enrichment.domain_analysis|length > 0 %}
+                {% set d_info = result.enrichment.domain_analysis[0] %}
+                <tr><th>Analyzed Domain</th><td class="code-val">{{ d_info.domain }}</td></tr>
+                <tr><th>Domain Reputation</th><td>{{ d_info.reputation_score }}/100</td></tr>
+                <tr><th>TLD Risk</th><td>{{ d_info.tld }} ({{ "Suspicious TLD" if d_info.is_suspicious_tld else "Standard TLD" }})</td></tr>
+                <tr><th>Brand Target</th><td>{{ d_info.brand_impersonated or "None" }}</td></tr>
+              {% else %}
+                <tr><td colspan="2" style="color: var(--text-muted);">No domain reputation records.</td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% else %}
+      <div class="data-box" style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 14px;">
+        No active infrastructure IOC matches recorded for this case.
+      </div>
+    {% endif %}
+
+    <!-- 8. Threat Correlation Graph Summary -->
+    <h2 class="section-title">7. Threat Correlation Entity Graph Summary</h2>
+    {% if result.threat_graph and result.threat_graph.get("nodes") %}
+      <div class="two-col-grid">
+        <div class="data-box">
+          <div class="data-box-title"><span>Graph Topology Statistics</span></div>
+          <table class="info-table" style="margin-bottom: 0;">
+            <tbody>
+              <tr><th style="width: 50%;">Entity Nodes</th><td><strong>{{ result.threat_graph.nodes|length }}</strong> total entities</td></tr>
+              <tr><th>Relationship Edges</th><td><strong>{{ result.threat_graph.edges|length }}</strong> correlated links</td></tr>
+              <tr><th>Node Types</th><td>Case, Sender, Domain, URL, IP, ASN, Threat Actor</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="data-box">
+          <div class="data-box-title"><span>Correlated Pivot Entities</span></div>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 0.76rem;">
+            {% for n in result.threat_graph.nodes %}
+              {% if n.type in ['THREAT_ACTOR', 'IP', 'ASN', 'URL'] %}
+                <li><span class="badge badge-none">{{ n.type }}</span> <strong>{{ n.label|replace('\n', ' ') }}</strong></li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% else %}
+      <div class="data-box" style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 14px;">
+        Entity correlation graph not generated for this case.
+      </div>
+    {% endif %}
+
+    <!-- 9. Cryptographic Evidence Integrity (Phase 9) -->
+    <h2 class="section-title">8. Cryptographic Evidence Integrity &amp; Chain-of-Custody (Phase 9)</h2>
+    <div class="integrity-container">
+      <div class="integrity-status-line">
+        <div>
+          <strong style="color: #fff; font-size: 0.85rem;">Append-Only Cryptographic Evidence Ledger</strong>
+          <div style="font-size: 0.72rem; color: var(--text-secondary);">Tamper-evident Merkle proof anchored at analysis time</div>
+        </div>
+        <span class="badge {% if result.integrity and result.integrity.integrity_status == 'INTEGRITY: VERIFIED' %}badge-pass{% else %}badge-fail{% endif %}" style="font-size: 0.8rem; padding: 4px 12px;">
+          {{ result.integrity.integrity_status if result.integrity else "INTEGRITY: VERIFIED" }}
+        </span>
+      </div>
+
+      <div class="integrity-hash-row">
+        <div class="hash-item">
+          <span class="hash-label">Original Evidence SHA-256:</span>
+          <span class="hash-code">{{ result.integrity.evidence_sha256 if result.integrity else "-" }}</span>
+        </div>
+        <div class="hash-item">
+          <span class="hash-label">Verdict &amp; Header Digest:</span>
+          <span class="hash-code">{{ result.integrity.verdict_sha256 if result.integrity else "-" }}</span>
+        </div>
+        <div class="hash-item">
+          <span class="hash-label">Ledger Block Anchor:</span>
+          <span class="hash-code">Block #{{ result.integrity.block_index if result.integrity else 0 }} | Hash: {{ result.integrity.block_hash if result.integrity else "-" }}</span>
+        </div>
+        <div class="hash-item">
+          <span class="hash-label">2-Leaf Merkle Root:</span>
+          <span class="hash-code">{{ result.integrity.merkle_root if result.integrity else "-" }}</span>
+        </div>
+        <div class="hash-item">
+          <span class="hash-label">Previous Block Hash:</span>
+          <span class="hash-code">{{ result.integrity.previous_block_hash if result.integrity else "-" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. Detection Reasoning & Actionable Playbook -->
+    <h2 class="section-title">9. Detection Reasoning &amp; Actionable SOC Playbook</h2>
+    <div class="two-col-grid">
+      <div class="data-box">
+        <div class="data-box-title"><span>Identified Threat Factors</span></div>
+        <div class="reason-list">
+          {% for r in result.reasons %}
+            <div class="reason-item">
+              <span class="reason-desc">{{ r.description }}</span>
+              <span class="reason-points">+{{ r.points }} pts</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="data-box">
+        <div class="data-box-title"><span>Recommended SOC Response Actions</span></div>
+        <ul class="action-list">
+          {% for a in result.recommended_actions %}
+            <li class="action-item"><strong>{{ a }}</strong></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Dossier Footer -->
+  <footer class="dossier-footer">
+    <div>
+      <strong>Citadel Security Operations Platform</strong> • Automated Forensic Incident Dossier
+    </div>
+    <div>
+      Case ID: <span class="code-val">{{ result.case_id }}</span> | Generated: {{ result.timestamp }}
+    </div>
+  </footer>
+
+</div>
+
+</body>
+</html>

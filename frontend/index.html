@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citadel // Email Threat Intelligence & BEC Detection</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="brand-shield">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="brand-title">CITADEL</h1>
+        <span class="brand-subtitle">Email Threat Intelligence & BEC Defense Platform</span>
+      </div>
+    </div>
+
+    <div class="header-meta">
+      <div class="meta-pill" id="case-id-pill">
+        <span class="meta-label">CASE ID:</span>
+        <span class="meta-value" id="case-id-val">READY</span>
+      </div>
+      <div class="meta-pill">
+        <span class="meta-label">SYSTEM:</span>
+        <span class="status-dot green"></span>
+        <span class="meta-value">ACTIVE (PHASE 1 MVP)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-layout">
+    
+    <!-- Ingestion & Quick Samples Panel -->
+    <section class="ingestion-section">
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="file-input" accept=".eml,.txt" style="display: none;">
+        <div class="drop-content">
+          <svg class="drop-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <div class="drop-text">
+            <strong>Drag & Drop .eml Email File</strong> or <button type="button" class="btn-link" id="browse-btn">Browse Local Files</button>
+          </div>
+          <span class="drop-sub">RFC 5322 MIME messages supported (.eml)</span>
+        </div>
+      </div>
+
+      <div class="sample-picker">
+        <div class="picker-header">
+          <span class="picker-title">⚡ Research Test Scenarios (Synthetic Benchmark Data):</span>
+          <span class="picker-hint">Pre-configured synthetic test scenarios based on attack archetypes from reference papers</span>
+        </div>
+        <div class="sample-buttons" id="sample-buttons-container">
+          <!-- Dynamically populated sample buttons -->
+          <button class="sample-btn" data-file="benign_project_update.eml">
+            <span class="badge clean">BENIGN</span> Corporate Sync
+          </button>
+          <button class="sample-btn" data-file="credential_phishing_link.eml">
+            <span class="badge phish">PHISHING</span> Credential Alert Link
+          </button>
+          <button class="sample-btn" data-file="bec_ceo_wire_fraud.eml">
+            <span class="badge bec">BEC</span> CEO Wire Fraud
+          </button>
+          <button class="sample-btn" data-file="bec_invoice_bank_change.eml">
+            <span class="badge bec">BEC</span> Bogus Invoice Bank Change
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Empty State Prompt -->
+    <div id="empty-state" class="state-placeholder">
+      <div class="placeholder-card">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        <h3>No Email Selected</h3>
+        <p>Drop an RFC 5322 <code>.eml</code> file above or select one of the pre-loaded research benchmark scenarios to begin forensic analysis.</p>
+      </div>
+    </div>
+
+    <!-- Live Analysis Dashboard (Hidden by default until email loaded) -->
+    <div id="results-dashboard" class="dashboard-grid" style="display: none;">
+      
+      <!-- Top Row: Executive Threat Verdict -->
+      <section class="card verdict-card">
+        <div class="verdict-header">
+          <div>
+            <span class="card-eyebrow">FORENSIC CASE OVERVIEW</span>
+            <h2 class="verdict-archetype" id="threat-archetype">Evaluating...</h2>
+            <div class="verdict-filename" id="verdict-filename">File: unnamed.eml</div>
+            <div class="synthetic-tag" id="synthetic-scenario-tag" style="display: none;">
+              🛡️ Synthetic Research Test Scenario (Not Live Threat Intelligence)
+            </div>
+          </div>
+          <div class="verdict-score-cluster">
+            <div class="gauge-box">
+              <span class="gauge-label">THREAT SCORE</span>
+              <div class="score-display">
+                <span class="score-num" id="threat-score-val">0</span>
+                <span class="score-max">/100</span>
+              </div>
+            </div>
+            <div class="badge-cluster">
+              <div class="risk-badge" id="risk-level-badge">LOW</div>
+              <div class="confidence-badge" id="confidence-badge" title="Heuristic multi-indicator agreement; not a statistical ML probability.">Heuristic Confidence: 95%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 8: Forensic Dossier Export Controls -->
+        <div class="dossier-actions-bar">
+          <button class="btn-dossier btn-dossier-primary" id="btn-generate-report" title="Generate printable HTML forensic incident dossier">
+            📄 Generate Forensic Report
+          </button>
+          <button class="btn-dossier" id="btn-print-report" title="Open and print/save PDF forensic dossier">
+            🖨️ Print / Export Dossier
+          </button>
+          <button class="btn-dossier" id="btn-download-json" title="Download SIEM/SOAR-ready structured JSON forensic export">
+            📥 Download JSON Evidence
+          </button>
+        </div>
+      </section>
+
+      <!-- Second Row: Headers & Auth vs Intent & Pretexting -->
+      <div class="two-col-row">
+        
+        <!-- Identity & Header Authentication Card -->
+        <section class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              Header Authentication & Identity Audit
+            </h3>
+            <span class="auth-notice-tag">
+              Parsed Headers Only
+            </span>
+          </div>
+
+          <div class="auth-banner-callout">
+            ⚠️ <strong>Static Header Parsing:</strong> SPF, DKIM, and DMARC statuses are extracted directly from message headers (Received-SPF / Authentication-Results). They are <strong>NOT</strong> independently verified via live DNS lookup.
+          </div>
+
+          <div class="metadata-table">
+            <div class="meta-row">
+              <span class="meta-k">Subject:</span>
+              <span class="meta-v highlight" id="meta-subject">-</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-k">From:</span>
+              <span class="meta-v" id="meta-from">-</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-k">Reply-To:</span>
+              <span class="meta-v" id="meta-reply-to">-</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-k">Return-Path:</span>
+              <span class="meta-v" id="meta-return-path">-</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-k">Date:</span>
+              <span class="meta-v" id="meta-date">-</span>
+            </div>
+          </div>
+
+          <!-- Protocol Authentication Badges -->
+          <div class="auth-grid">
+            <div class="auth-box" id="auth-box-spf">
+              <span class="auth-protocol">SPF (Parsed)</span>
+              <span class="auth-status" id="spf-status">NONE</span>
+            </div>
+            <div class="auth-box" id="auth-box-dkim">
+              <span class="auth-protocol">DKIM (Parsed)</span>
+              <span class="auth-status" id="dkim-status">NONE</span>
+            </div>
+            <div class="auth-box" id="auth-box-dmarc">
+              <span class="auth-protocol">DMARC (Parsed)</span>
+              <span class="auth-status" id="dmarc-status">NONE</span>
+            </div>
+          </div>
+
+          <!-- Identity Spoofing Alerts -->
+          <div id="spoof-alerts-container" class="spoof-alerts-list">
+            <!-- Spoofing details injected here -->
+          </div>
+        </section>
+
+        <!-- Intent & Social Engineering Card (Paper 2 Taxonomy) -->
+        <section class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              Social Engineering & BEC Intent Radar
+            </h3>
+            <span class="card-meta-tag" id="intent-score-badge">Intent Score: 0/100</span>
+          </div>
+
+          <div class="intent-categories">
+            <!-- Financial Wire Pretexting -->
+            <div class="intent-item" id="intent-item-financial">
+              <div class="intent-title-bar">
+                <span class="intent-name">Financial Transaction / Banking Alteration</span>
+                <span class="intent-status-pill" id="financial-flag">NO</span>
+              </div>
+              <div class="keyword-tags" id="financial-keywords">None detected</div>
+            </div>
+
+            <!-- Urgency & Coercion -->
+            <div class="intent-item" id="intent-item-urgency">
+              <div class="intent-title-bar">
+                <span class="intent-name">Urgency & Coercive Deadline</span>
+                <span class="intent-status-pill" id="urgency-flag">NO</span>
+              </div>
+              <div class="keyword-tags" id="urgency-keywords">None detected</div>
+            </div>
+
+            <!-- Authority Pretexting -->
+            <div class="intent-item" id="intent-item-authority">
+              <div class="intent-title-bar">
+                <span class="intent-name">Executive Authority & Confidentiality</span>
+                <span class="intent-status-pill" id="authority-flag">NO</span>
+              </div>
+              <div class="keyword-tags" id="authority-keywords">None detected</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ML Classification Card (Phase 2: TF-IDF + Logistic Regression) -->
+      <section class="card" id="ml-card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+            ML Text Classification (TF-IDF + Logistic Regression)
+          </h3>
+          <span class="auth-notice-tag" id="ml-status-tag">ML Engine: Loading...</span>
+        </div>
+        <div class="ml-grid">
+          <div class="ml-prediction-box">
+            <span class="ml-label">Predicted Class</span>
+            <span class="ml-value" id="ml-predicted-label">—</span>
+          </div>
+          <div class="ml-prediction-box">
+            <span class="ml-label">ML Confidence</span>
+            <span class="ml-value" id="ml-confidence-val">—</span>
+          </div>
+          <div class="ml-prob-bars" id="ml-prob-bars">
+            <div class="prob-row"><span class="prob-name">Benign</span><div class="prob-track"><div class="prob-fill benign-fill" id="prob-benign" style="width:0%"></div></div><span class="prob-pct" id="prob-benign-pct">0%</span></div>
+            <div class="prob-row"><span class="prob-name">Phishing</span><div class="prob-track"><div class="prob-fill phishing-fill" id="prob-phishing" style="width:0%"></div></div><span class="prob-pct" id="prob-phishing-pct">0%</span></div>
+            <div class="prob-row"><span class="prob-name">BEC</span><div class="prob-track"><div class="prob-fill bec-fill" id="prob-bec" style="width:0%"></div></div><span class="prob-pct" id="prob-bec-pct">0%</span></div>
+          </div>
+        </div>
+        <div class="ml-disclaimer">Trained on synthetic benchmark corpus. Probabilities complement the heuristic engine and do NOT represent standalone production accuracy.</div>
+      </section>
+
+      <!-- Contextual NLP & Semantic Pretexting Radar (Phase 4: DistilBERT/RoBERTa-Aligned Engine) -->
+      <section class="card" id="nlp-card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            Contextual NLP &amp; Semantic Pretexting Radar (Phase 4)
+          </h3>
+          <span class="auth-notice-tag" id="nlp-status-tag">Engine: Semantic Vector Alignment</span>
+        </div>
+        <div class="nlp-grid">
+          <div class="nlp-metric-card">
+            <span class="ml-label">Dominant Pretext Archetype</span>
+            <span class="nlp-archetype-value" id="nlp-dominant-archetype">—</span>
+            <span class="nlp-tone-badge" id="nlp-tone">—</span>
+          </div>
+          <div class="nlp-metric-card">
+            <span class="ml-label">Psychological Coercion Index</span>
+            <span class="nlp-coercion-value" id="nlp-coercion-val">0.0</span>
+            <span class="table-badge" id="nlp-coercion-level">LOW</span>
+          </div>
+          <div class="nlp-sim-bars" id="nlp-sim-bars">
+            <div class="prob-row"><span class="prob-name" style="width:110px;">CEO Fraud</span><div class="prob-track"><div class="prob-fill bec-fill" id="sim-ceo" style="width:0%"></div></div><span class="prob-pct" id="sim-ceo-pct">0.00</span></div>
+            <div class="prob-row"><span class="prob-name" style="width:110px;">Invoice Alteration</span><div class="prob-track"><div class="prob-fill phishing-fill" id="sim-invoice" style="width:0%"></div></div><span class="prob-pct" id="sim-invoice-pct">0.00</span></div>
+            <div class="prob-row"><span class="prob-name" style="width:110px;">Credential Phish</span><div class="prob-track"><div class="prob-fill phishing-fill" id="sim-cred" style="width:0%"></div></div><span class="prob-pct" id="sim-cred-pct">0.00</span></div>
+            <div class="prob-row"><span class="prob-name" style="width:110px;">Benign Collab</span><div class="prob-track"><div class="prob-fill benign-fill" id="sim-benign" style="width:0%"></div></div><span class="prob-pct" id="sim-benign-pct">0.00</span></div>
+          </div>
+        </div>
+        <div class="ml-disclaimer">Contextual semantic cosine alignment against curated threat archetypes; evaluates coercive urgency, isolation, and authority pretexting velocity.</div>
+      </section>
+
+      <!-- Third Row: URL Intelligence (Paper 3 AR-LRF Feature Set) -->
+      <section class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            URL & Domain Intelligence Radar (Paper 3: AR-LRF Features)
+          </h3>
+          <span class="card-meta-tag" id="url-count-tag">0 URLs Extracted</span>
+        </div>
+
+        <div id="url-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Extracted URL</th>
+                <th>Domain / Host</th>
+                <th>Entropy ($H$)</th>
+                <th>Structural Anomaly Flags</th>
+                <th>Risk Score</th>
+                <th>Verdict</th>
+              </tr>
+            </thead>
+            <tbody id="url-table-body">
+              <!-- URLs injected dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Domain Intelligence / Enrichment Card (Phase 3) -->
+      <section class="card" id="enrichment-card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            Domain Intelligence &amp; Reputation Enrichment
+          </h3>
+          <span class="card-meta-tag" id="enrichment-count-tag">0 Domains Analyzed</span>
+        </div>
+        <div id="enrichment-content">
+          <div class="empty-url-notice">No domain enrichment data yet. Analyze an email to see results.</div>
+        </div>
+      </section>
+
+      <!-- Cryptographic Evidence Integrity & Chain-of-Custody Ledger (Phase 9) -->
+      <section class="card" id="integrity-card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Cryptographic Evidence Integrity &amp; Blockchain Ledger (Phase 9)
+          </h3>
+          <div class="integrity-header-controls">
+            <span class="integrity-badge badge-verified" id="integrity-status-badge">INTEGRITY: VERIFIED</span>
+            <button class="btn-sample" id="btn-verify-integrity">🛡️ Verify Integrity</button>
+            <button class="btn-sample btn-tamper" id="btn-simulate-tamper" title="Simulate evidence modification to demonstrate tamper detection">⚡ Test Tamper</button>
+          </div>
+        </div>
+
+        <div class="integrity-grid">
+          <!-- Evidence SHA-256 Box -->
+          <div class="integrity-metric-card">
+            <div class="integrity-card-label">Original Evidence SHA-256 (Raw RFC 5322 Bytes)</div>
+            <div class="integrity-hash-box">
+              <code id="integrity-evidence-sha256">—</code>
+            </div>
+            <div class="integrity-subtext">Hashed from exact uploaded bytes prior to parsing; guarantees message authenticity.</div>
+          </div>
+
+          <!-- Verdict & Headers SHA-256 Box -->
+          <div class="integrity-metric-card">
+            <div class="integrity-card-label">Verdict &amp; Header Digest (Canonical SHA-256)</div>
+            <div class="integrity-hash-box">
+              <code id="integrity-verdict-sha256">—</code>
+            </div>
+            <div class="integrity-subtext">Canonical digest binding detected score, risk level, archetype, and routing headers.</div>
+          </div>
+
+          <!-- Blockchain Ledger Block Anchor Box -->
+          <div class="integrity-metric-card">
+            <div class="integrity-card-label">Append-Only Cryptographic Ledger Anchor</div>
+            <div class="ledger-anchor-info">
+              <div><strong>Ledger Block:</strong> <span id="ledger-block-idx">#0</span></div>
+              <div><strong>Merkle Root:</strong> <code id="ledger-merkle-root">—</code></div>
+              <div><strong>Block Hash:</strong> <code id="ledger-block-hash">—</code></div>
+              <div><strong>Previous Block:</strong> <code id="ledger-prev-hash">—</code></div>
+              <div><strong>Chain Timestamp:</strong> <span id="ledger-timestamp">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verification Checklist Banner -->
+        <div id="integrity-verification-banner" class="integrity-banner-verified">
+          <div class="integrity-banner-title">
+            <span id="verification-icon">✓</span>
+            <span id="verification-headline">Cryptographic Chain of Custody Confirmed</span>
+          </div>
+          <div class="integrity-checks-row" id="verification-checks-row">
+            <span class="check-pill check-pass" id="chk-evidence">Evidence Hash: Match</span>
+            <span class="check-pill check-pass" id="chk-verdict">Verdict Digest: Match</span>
+            <span class="check-pill check-pass" id="chk-merkle">Merkle Tree Root: Valid</span>
+            <span class="check-pill check-pass" id="chk-ledger">Ledger Chain Linkage: Intact</span>
+          </div>
+          <div class="integrity-banner-detail" id="verification-detail">
+            Original RFC 5322 message bytes and detection verdict match the append-only cryptographic evidence ledger without tampering.
+          </div>
+        </div>
+      </section>
+
+      <!-- Interactive SOC Threat Correlation Graph (Phase 5) -->
+      <section class="card" id="threat-graph-card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            Interactive SOC Threat Correlation Graph (Phase 5)
+          </h3>
+          <div class="graph-header-controls">
+            <span class="card-meta-tag" id="graph-nodes-count">0 Entities Correlated</span>
+            <button class="btn-sample" id="graph-reset-btn" style="padding:4px 10px; font-size:0.75rem;">⟲ Reset Physics</button>
+          </div>
+        </div>
+        <div class="graph-legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#38bdf8"></span>Email Case</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#a855f7"></span>Sender Identity</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span>Domain</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span>Extracted URL</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>Resolved IP</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#10b981"></span>Routing ASN</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#dc2626"></span>Threat Actor</span>
+        </div>
+        <div class="threat-graph-wrapper">
+          <canvas id="threat-graph-canvas" width="1120" height="400"></canvas>
+          <div id="graph-node-inspector" class="graph-inspector-panel">
+            <div class="inspector-header">
+              <span id="inspector-title">Entity Dossier</span>
+              <button id="inspector-close" class="inspector-close-btn">&times;</button>
+            </div>
+            <div id="inspector-body" class="inspector-body">Click on any graph node to inspect live entity metadata.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Fourth Row: Reasons & Recommended SOC Actions -->
+      <div class="two-col-row">
+        <!-- Detection Reasoning & Factor Breakdown -->
+        <section class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+              Detection Reasoning & Risk Factors
+            </h3>
+          </div>
+          <div class="reasons-list" id="reasons-list">
+            <!-- Reasons injected dynamically -->
+          </div>
+        </section>
+
+        <!-- Recommended SOC Playbook Actions -->
+        <section class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              Actionable SOC Response Playbook
+            </h3>
+          </div>
+          <ul class="action-checklist" id="actions-list">
+            <!-- Actions injected dynamically -->
+          </ul>
+        </section>
+      </div>
+
+      <!-- Fifth Row: Email Body Preview -->
+      <section class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+            Normalized Message Body Inspection
+          </h3>
+        </div>
+        <div class="body-preview" id="email-body-preview">
+          (No content)
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <span>Citadel Email Security Platform v1.0.0-mvp</span>
+    <span>Based on Research by Ahmed et al., Almutairi et al., Chaudhuri et al., and Uddin et al.</span>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

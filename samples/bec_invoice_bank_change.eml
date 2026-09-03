@@ -1,0 +1,31 @@
+From: "Apex Logistics Billing Dept" <billing@apex-logistics-corp.com>
+To: "Accounts Payable" <ap@acme-corp.internal>
+Subject: IMPORTANT: New Banking Details & Wire Remittance for Invoice #INV-2026-90412
+Date: Wed, 03 Sep 2026 16:10:00 +0000
+Message-ID: <inv-update-48201@apex-logistics-finance.xyz>
+Return-Path: <bounce@apex-logistics-finance.xyz>
+Reply-To: remittance-desk@apex-logistics-finance.xyz
+Authentication-Results: mx.acme-corp.internal; spf=softfail smtp.mailfrom=apex-logistics-finance.xyz; dkim=none; dmarc=none
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+Attention Accounts Payable Team,
+
+Please be advised that due to our recent fiscal year-end banking audit and corporate restructuring, our standard remittance account has changed with immediate effect.
+
+Do NOT send funds to our previous Citibank depository. All pending and future wire transfer payments must be routed to our new banking instructions below:
+
+Beneficiary Bank: Metro First Commercial Bank
+Routing Number (ABA): 021000089
+Account Number: 98421038592
+SWIFT Code: MFCBUS33XXX
+Beneficiary Name: Apex Supply & Freight Solutions LLC
+Invoice Reference: #INV-2026-90412
+Amount Due: $74,850.00 USD
+
+Payment is due promptly within 24 hours. Please send the wire confirmation receipt directly to this thread once transmitted to prevent shipment holds.
+
+Sincerely,
+Markus Vance
+Senior Accounting Controller
+Apex Logistics Services

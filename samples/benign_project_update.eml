@@ -1,0 +1,26 @@
+From: "Sarah Jenkins" <sarah.jenkins@acme-corp.internal>
+To: "Engineering Team" <dev-team@acme-corp.internal>
+Subject: Project Nexus: Sprint Review & Architecture Sync (Q3)
+Date: Wed, 03 Sep 2026 14:30:00 +0000
+Message-ID: <nexus-sprint-9821@acme-corp.internal>
+Return-Path: <sarah.jenkins@acme-corp.internal>
+Authentication-Results: mx.acme-corp.internal; spf=pass smtp.mailfrom=acme-corp.internal; dkim=pass header.d=acme-corp.internal; dmarc=pass
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+Hi Team,
+
+Just a quick reminder that our bi-weekly Sprint Review is scheduled for tomorrow at 10:00 AM UTC in Conference Room B and via our internal video bridge.
+
+Agenda items:
+1. Review of Citadel Phase 1 pipeline integration.
+2. Automated test suite coverage and performance benchmarks.
+3. Roadmap planning for next sprint deliverables.
+
+Please make sure your ticket statuses are updated on our internal portal:
+https://portal.acme-corp.internal/jira/projects/NEXUS
+
+Best regards,
+Sarah Jenkins
+Technical Lead | Core Infrastructure
+Acme Corporation

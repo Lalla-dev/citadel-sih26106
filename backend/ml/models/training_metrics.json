@@ -1,0 +1,23 @@
+{
+  "accuracy": 1.0,
+  "total_samples": 480,
+  "train_samples": 384,
+  "test_samples": 96,
+  "per_class": {
+    "benign": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "phishing": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "bec": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  }
+}
