@@ -666,10 +666,16 @@ class CitadelDetectorOrchestrator:
         except Exception:
             pass
 
-        # Store in case results repository for forensic reporting (Phase 8)
+        # Store in case results repository for forensic reporting (Phase 8) and case management (Phase 7)
         try:
             from backend.reports import store_case_result
             store_case_result(result)
+        except Exception:
+            pass
+
+        try:
+            from backend.cases import get_case_repository
+            get_case_repository().create_or_update_from_analysis(result)
         except Exception:
             pass
 

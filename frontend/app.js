@@ -45,6 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Initialize Phase 7 SOC Case Management Queue
+  initCaseQueue();
+  loadCaseQueue();
+
   function handleFileSelect(e) {
     const files = e.target.files;
     if (files.length > 0) {
@@ -455,6 +459,245 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 12. Threat Correlation Graph (Phase 5)
     renderThreatGraph(data.threat_graph);
+
+    // 13. Refresh SOC Incident Triage Queue (Phase 7)
+    if (typeof loadCaseQueue === 'function') {
+      loadCaseQueue();
+    }
+  }
+
+  // -------------------------------------------------------------
+  // Phase 7: SOC Incident Triage Queue & Case Management
+  // -------------------------------------------------------------
+  let activeNotesCaseId = null;
+
+  function initCaseQueue() {
+    const searchInput = document.getElementById('queue-search-input');
+    const statusFilter = document.getElementById('queue-status-filter');
+    const riskFilter = document.getElementById('queue-risk-filter');
+    const refreshBtn = document.getElementById('btn-refresh-queue');
+    const notesCloseBtn = document.getElementById('notes-modal-close');
+    const saveNoteBtn = document.getElementById('btn-save-note');
+
+    if (searchInput) {
+      let debounceTimer;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(loadCaseQueue, 250);
+      });
+    }
+
+    if (statusFilter) statusFilter.addEventListener('change', loadCaseQueue);
+    if (riskFilter) riskFilter.addEventListener('change', loadCaseQueue);
+    if (refreshBtn) refreshBtn.addEventListener('click', loadCaseQueue);
+
+    if (notesCloseBtn) {
+      notesCloseBtn.addEventListener('click', () => {
+        document.getElementById('case-notes-modal').style.display = 'none';
+        activeNotesCaseId = null;
+      });
+    }
+
+    if (saveNoteBtn) {
+      saveNoteBtn.addEventListener('click', async () => {
+        const textElem = document.getElementById('new-note-text');
+        const authorElem = document.getElementById('new-note-author');
+        const noteText = textElem.value.trim();
+        const author = authorElem.value.trim() || 'SOC Analyst';
+
+        if (!noteText || !activeNotesCaseId) return;
+
+        saveNoteBtn.disabled = true;
+        saveNoteBtn.textContent = 'Saving...';
+
+        try {
+          const res = await fetch(`/api/cases/${encodeURIComponent(activeNotesCaseId)}/notes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ note: noteText, author: author })
+          });
+          if (res.ok) {
+            textElem.value = '';
+            await openCaseNotes(activeNotesCaseId);
+            loadCaseQueue();
+          } else {
+            alert('Failed to save note.');
+          }
+        } catch (e) {
+          alert('Error saving note: ' + e.message);
+        } finally {
+          saveNoteBtn.disabled = false;
+          saveNoteBtn.textContent = '💾 Save Note';
+        }
+      });
+    }
+  }
+
+  async function loadCaseQueue() {
+    const searchInput = document.getElementById('queue-search-input');
+    const statusFilter = document.getElementById('queue-status-filter');
+    const riskFilter = document.getElementById('queue-risk-filter');
+    const tbody = document.getElementById('queue-table-body');
+
+    if (!tbody) return;
+
+    const query = searchInput ? searchInput.value.trim() : '';
+    const status = statusFilter ? statusFilter.value : 'ALL';
+    const risk = riskFilter ? riskFilter.value : 'ALL';
+
+    const params = new URLSearchParams();
+    if (query) params.set('search', query);
+    if (status && status !== 'ALL') params.set('status', status);
+    if (risk && risk !== 'ALL') params.set('risk_level', risk);
+
+    try {
+      const res = await fetch(`/api/cases?${params.toString()}`);
+      if (!res.ok) return;
+      const data = await res.json();
+
+      // Update aggregate stat pills
+      if (data.stats) {
+        const s = data.stats;
+        document.getElementById('stat-total-cases').textContent = `Cases: ${s.total_cases}`;
+        document.getElementById('stat-critical-cases').textContent = `Critical/High: ${s.critical_high}`;
+        document.getElementById('stat-investigating-cases').textContent = `Active: ${s.investigating}`;
+        document.getElementById('stat-contained-cases').textContent = `Contained: ${s.contained_resolved}`;
+      }
+
+      // Render table rows
+      tbody.innerHTML = '';
+      if (!data.cases || data.cases.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="queue-empty-msg">No cases match the current filter criteria.</td></tr>`;
+        return;
+      }
+
+      data.cases.forEach(c => {
+        const tr = document.createElement('tr');
+
+        const scoreClass = c.threat_score >= 80 ? 'risk-critical' : (c.threat_score >= 50 ? 'risk-high' : 'risk-low');
+        const formattedDate = c.created_at ? c.created_at.substring(11, 19) + ' UTC' : '-';
+
+        tr.innerHTML = `
+          <td><span class="queue-case-link" data-case-id="${escapeHtml(c.case_id)}">${escapeHtml(c.case_id)}</span></td>
+          <td style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary);">${formattedDate}</td>
+          <td>
+            <div style="font-weight: 600; color: #fff; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(c.subject)}</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(c.sender)}</div>
+          </td>
+          <td>
+            <strong class="${scoreClass}">${c.threat_score}/100</strong>
+            <span class="badge ${c.risk_level === 'CRITICAL' ? 'badge-fail' : (c.risk_level === 'HIGH' ? 'badge-warn' : 'badge-pass')}" style="margin-left: 4px;">${c.risk_level}</span>
+          </td>
+          <td><span style="font-size: 0.75rem; color: var(--text-secondary);">${escapeHtml(c.threat_archetype)}</span></td>
+          <td>
+            <select class="status-select-pill status-${c.status}" data-case-id="${escapeHtml(c.case_id)}">
+              <option value="NEW" ${c.status === 'NEW' ? 'selected' : ''}>NEW</option>
+              <option value="TRIAGED" ${c.status === 'TRIAGED' ? 'selected' : ''}>TRIAGED</option>
+              <option value="INVESTIGATING" ${c.status === 'INVESTIGATING' ? 'selected' : ''}>INVESTIGATING</option>
+              <option value="CONTAINED" ${c.status === 'CONTAINED' ? 'selected' : ''}>CONTAINED</option>
+              <option value="RESOLVED" ${c.status === 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>
+              <option value="FALSE_POSITIVE" ${c.status === 'FALSE_POSITIVE' ? 'selected' : ''}>FALSE POSITIVE</option>
+            </select>
+          </td>
+          <td style="font-size: 0.75rem; color: var(--text-secondary);">${escapeHtml(c.assigned_analyst || 'Unassigned')}</td>
+          <td>
+            <div class="queue-actions-cluster">
+              <button class="btn-queue-sm btn-inspect-case" data-case-id="${escapeHtml(c.case_id)}" title="Inspect full analysis on dashboard">🔍 Inspect</button>
+              <button class="btn-queue-sm btn-notes-case" data-case-id="${escapeHtml(c.case_id)}" title="View/add analyst notes">📝 Notes (${c.notes ? c.notes.length : 0})</button>
+              <button class="btn-queue-sm btn-dossier-case" data-case-id="${escapeHtml(c.case_id)}" title="Open Phase 8 Forensic Dossier">📄 Dossier</button>
+            </div>
+          </td>
+        `;
+
+        // Wire status change
+        const sel = tr.querySelector('.status-select-pill');
+        sel.addEventListener('change', async (e) => {
+          const newStatus = e.target.value;
+          sel.className = `status-select-pill status-${newStatus}`;
+          try {
+            await fetch(`/api/cases/${encodeURIComponent(c.case_id)}/status`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: newStatus })
+            });
+            loadCaseQueue();
+          } catch (err) {
+            alert('Failed to update status: ' + err.message);
+          }
+        });
+
+        // Wire inspect
+        tr.querySelector('.btn-inspect-case').addEventListener('click', () => inspectCase(c.case_id));
+        tr.querySelector('.queue-case-link').addEventListener('click', () => inspectCase(c.case_id));
+
+        // Wire notes
+        tr.querySelector('.btn-notes-case').addEventListener('click', () => openCaseNotes(c.case_id));
+
+        // Wire dossier
+        tr.querySelector('.btn-dossier-case').addEventListener('click', () => {
+          window.open(`/api/case/${encodeURIComponent(c.case_id)}/report`, '_blank');
+        });
+
+        tbody.appendChild(tr);
+      });
+    } catch (e) {
+      console.error('Failed to load case queue:', e);
+    }
+  }
+
+  async function inspectCase(caseId) {
+    try {
+      const res = await fetch(`/api/cases/${encodeURIComponent(caseId)}`);
+      if (!res.ok) return;
+      const ticket = await res.json();
+      if (ticket.analysis_result) {
+        emptyState.style.display = 'none';
+        resultsDashboard.style.display = 'flex';
+        renderDashboard(ticket.analysis_result);
+        window.scrollTo({ top: resultsDashboard.offsetTop - 20, behavior: 'smooth' });
+      }
+    } catch (e) {
+      alert('Failed to inspect case: ' + e.message);
+    }
+  }
+
+  async function openCaseNotes(caseId) {
+    activeNotesCaseId = caseId;
+    const modal = document.getElementById('case-notes-modal');
+    const title = document.getElementById('notes-modal-title');
+    const historyList = document.getElementById('notes-history-list');
+
+    title.textContent = `Analyst Notes // Case: ${caseId}`;
+    modal.style.display = 'flex';
+    historyList.innerHTML = '<div style="color:var(--text-muted); font-size:0.75rem;">Loading notes...</div>';
+
+    try {
+      const res = await fetch(`/api/cases/${encodeURIComponent(caseId)}`);
+      if (!res.ok) return;
+      const ticket = await res.json();
+      historyList.innerHTML = '';
+
+      if (!ticket.notes || ticket.notes.length === 0) {
+        historyList.innerHTML = '<div style="color:var(--text-muted); font-size:0.75rem;">No investigation notes recorded for this case yet.</div>';
+        return;
+      }
+
+      ticket.notes.forEach(n => {
+        const bubble = document.createElement('div');
+        bubble.className = 'note-bubble';
+        bubble.innerHTML = `
+          <div class="note-meta">
+            <span class="note-author">${escapeHtml(n.author)}</span>
+            <span>${escapeHtml(n.timestamp ? n.timestamp.substring(0, 19).replace('T', ' ') : '')}</span>
+          </div>
+          <div class="note-text">${escapeHtml(n.note)}</div>
+        `;
+        historyList.appendChild(bubble);
+      });
+      historyList.scrollTop = historyList.scrollHeight;
+    } catch (e) {
+      historyList.innerHTML = `<div style="color:var(--color-critical); font-size:0.75rem;">Error loading notes: ${escapeHtml(e.message)}</div>`;
+    }
   }
 
   // -------------------------------------------------------------

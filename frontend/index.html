@@ -82,6 +82,105 @@
       </div>
     </section>
 
+    <!-- Phase 7: SOC Incident Triage Queue & Case Management -->
+    <section class="card triage-queue-card" id="triage-queue-section">
+      <div class="card-header queue-header">
+        <div class="queue-header-left">
+          <h3 class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            SOC Incident Triage Queue &amp; Case Management (Phase 7)
+          </h3>
+          <div class="queue-stats-badges" id="queue-stats-badges">
+            <span class="stat-pill" id="stat-total-cases">Cases: 0</span>
+            <span class="stat-pill stat-critical" id="stat-critical-cases">Critical/High: 0</span>
+            <span class="stat-pill stat-investigating" id="stat-investigating-cases">Active: 0</span>
+            <span class="stat-pill stat-contained" id="stat-contained-cases">Contained: 0</span>
+          </div>
+        </div>
+        <div class="queue-header-right">
+          <button class="btn-sample" id="btn-refresh-queue">🔄 Refresh Queue</button>
+        </div>
+      </div>
+
+      <!-- Queue Toolbar Filters -->
+      <div class="queue-toolbar">
+        <div class="search-input-wrap">
+          <input type="text" id="queue-search-input" placeholder="Filter by Case ID, Sender, Subject, Archetype..." class="queue-filter-input">
+        </div>
+        <div class="filter-dropdown-wrap">
+          <label>Status:</label>
+          <select id="queue-status-filter" class="queue-filter-select">
+            <option value="ALL">All Statuses</option>
+            <option value="NEW">NEW</option>
+            <option value="TRIAGED">TRIAGED</option>
+            <option value="INVESTIGATING">INVESTIGATING</option>
+            <option value="CONTAINED">CONTAINED</option>
+            <option value="RESOLVED">RESOLVED</option>
+            <option value="FALSE_POSITIVE">FALSE POSITIVE</option>
+          </select>
+        </div>
+        <div class="filter-dropdown-wrap">
+          <label>Risk Level:</label>
+          <select id="queue-risk-filter" class="queue-filter-select">
+            <option value="ALL">All Risk Levels</option>
+            <option value="CRITICAL">CRITICAL</option>
+            <option value="HIGH">HIGH</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="LOW">LOW</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Queue Table -->
+      <div class="queue-table-wrap">
+        <table class="queue-table">
+          <thead>
+            <tr>
+              <th>Case ID</th>
+              <th>Time (UTC)</th>
+              <th>Subject &amp; Sender</th>
+              <th>Score / Risk</th>
+              <th>Archetype</th>
+              <th>Lifecycle Status</th>
+              <th>Assigned Analyst</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="queue-table-body">
+            <tr>
+              <td colspan="8" class="queue-empty-msg">No cases recorded yet. Analyze an email above to populate the triage queue.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Notes Modal / Drawer (Inline) -->
+      <div id="case-notes-modal" class="notes-modal" style="display: none;">
+        <div class="notes-modal-content">
+          <div class="notes-modal-header">
+            <h4 id="notes-modal-title">Analyst Notes // Case</h4>
+            <button class="inspector-close-btn" id="notes-modal-close">&times;</button>
+          </div>
+          <div class="notes-history-list" id="notes-history-list">
+            <!-- Notes injected dynamically -->
+          </div>
+          <div class="notes-input-area">
+            <textarea id="new-note-text" placeholder="Add timestamped SOC investigation note (e.g. Quarantined on mail gateway, isolated endpoint)..." rows="3"></textarea>
+            <div class="notes-input-controls">
+              <input type="text" id="new-note-author" placeholder="Analyst Name" value="Tier-1 SOC Analyst">
+              <button class="btn-sample btn-dossier-primary" id="btn-save-note">💾 Save Note</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Empty State Prompt -->
     <div id="empty-state" class="state-placeholder">
       <div class="placeholder-card">

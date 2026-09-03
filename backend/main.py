@@ -212,6 +212,79 @@ def get_case_report_json(case_id: str):
         )
     return generate_json_report(result)
 
+# -------------------------------------------------------------
+# Phase 7: SOC Case Management & Incident Triage Endpoints
+# -------------------------------------------------------------
+@app.get("/api/cases")
+def list_cases_endpoint(
+    status: Optional[str] = None,
+    risk_level: Optional[str] = None,
+    search: Optional[str] = None
+):
+    """
+    Returns the live SOC incident queue filtered by status, risk level, or keyword.
+    Includes aggregate queue statistics.
+    """
+    from backend.cases import get_case_repository
+    repo = get_case_repository()
+    cases = repo.list_cases(status=status, risk_level=risk_level, search=search)
+    stats = repo.get_queue_statistics()
+    return {
+        "cases": [c.model_dump(exclude={"analysis_result"}) for c in cases],
+        "stats": stats,
+        "count": len(cases)
+    }
+
+@app.get("/api/cases/{case_id}")
+def get_case_details_endpoint(case_id: str):
+    """
+    Retrieves full details for a case ticket, including historical notes and full AnalysisResult.
+    """
+    from backend.cases import get_case_repository
+    repo = get_case_repository()
+    ticket = repo.get_case(case_id)
+    if not ticket:
+        raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found.")
+    return ticket.model_dump()
+
+@app.patch("/api/cases/{case_id}/status")
+def update_case_status_endpoint(case_id: str, payload: Dict[str, Any]):
+    """
+    Updates the incident lifecycle status and optionally re-assigns an analyst.
+    Allowed statuses: NEW, TRIAGED, INVESTIGATING, CONTAINED, RESOLVED, FALSE_POSITIVE
+    """
+    from backend.cases import get_case_repository
+    repo = get_case_repository()
+    status = payload.get("status")
+    analyst = payload.get("analyst")
+    if not status:
+        raise HTTPException(status_code=400, detail="Missing required field 'status'.")
+
+    try:
+        updated = repo.update_status(case_id, status=status, analyst=analyst)
+        if not updated:
+            raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found.")
+        return updated.model_dump()
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+
+@app.post("/api/cases/{case_id}/notes")
+def add_case_note_endpoint(case_id: str, payload: Dict[str, Any]):
+    """
+    Adds a timestamped analyst investigation note to the case ticket.
+    """
+    from backend.cases import get_case_repository
+    repo = get_case_repository()
+    note_text = payload.get("note")
+    author = payload.get("author", "SOC Analyst")
+    if not note_text:
+        raise HTTPException(status_code=400, detail="Missing required field 'note'.")
+
+    updated = repo.add_note(case_id, note_text=note_text, author=author)
+    if not updated:
+        raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found.")
+    return updated.model_dump()
+
 # Mount static frontend files if directory exists
 if FRONTEND_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")

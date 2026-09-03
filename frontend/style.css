@@ -437,6 +437,293 @@ body {
   text-align: center;
 }
 
+/* =============================================================
+   Phase 7: SOC Incident Triage Queue & Case Management
+   ============================================================= */
+.triage-queue-card {
+  margin-bottom: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+}
+
+.queue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.queue-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.queue-stats-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stat-pill {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  color: var(--text-secondary);
+}
+
+.stat-critical {
+  color: var(--color-critical);
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.stat-investigating {
+  color: var(--color-medium);
+  border-color: rgba(234, 179, 8, 0.3);
+  background: rgba(234, 179, 8, 0.08);
+}
+
+.stat-contained {
+  color: var(--color-clean);
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.queue-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: 6px;
+}
+
+.search-input-wrap {
+  flex: 1;
+  min-width: 240px;
+}
+
+.queue-filter-input {
+  width: 100%;
+  background: #06090e;
+  border: 1px solid var(--border-bright);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+.queue-filter-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+.filter-dropdown-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.queue-filter-select {
+  background: #06090e;
+  border: 1px solid var(--border-bright);
+  color: var(--text-primary);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+.queue-filter-select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+.queue-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-dim);
+  border-radius: 6px;
+}
+
+.queue-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  text-align: left;
+}
+
+.queue-table th {
+  background: #0a0e17;
+  color: var(--text-secondary);
+  font-weight: 700;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-dim);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.queue-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.queue-table tr:hover {
+  background: rgba(56, 189, 248, 0.03);
+}
+
+.queue-empty-msg {
+  text-align: center;
+  padding: 24px !important;
+  color: var(--text-muted);
+}
+
+.queue-case-link {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-blue);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.queue-case-link:hover {
+  color: #7dd3fc;
+}
+
+.status-select-pill {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-bright);
+  background: #0a0e17;
+  cursor: pointer;
+}
+.status-NEW { color: var(--accent-blue); border-color: rgba(56, 189, 248, 0.4); }
+.status-TRIAGED { color: var(--accent-indigo); border-color: rgba(129, 140, 248, 0.4); }
+.status-INVESTIGATING { color: var(--color-medium); border-color: rgba(234, 179, 8, 0.4); }
+.status-CONTAINED { color: var(--color-critical); border-color: rgba(239, 68, 68, 0.4); }
+.status-RESOLVED { color: var(--color-clean); border-color: rgba(16, 185, 129, 0.4); }
+.status-FALSE_POSITIVE { color: var(--text-muted); border-color: rgba(107, 114, 128, 0.4); }
+
+.queue-actions-cluster {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-queue-sm {
+  background: #111827;
+  color: var(--text-primary);
+  border: 1px solid var(--border-dim);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.btn-queue-sm:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+/* Notes Modal */
+.notes-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.notes-modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+  border-radius: 10px;
+  width: 90%;
+  max-width: 600px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+.notes-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.notes-history-list {
+  max-height: 240px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.note-bubble {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+}
+.note-meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+}
+.note-author { font-weight: 700; color: var(--accent-blue); }
+.note-text { color: var(--text-primary); line-height: 1.4; }
+
+.notes-input-area textarea {
+  width: 100%;
+  background: #06090e;
+  border: 1px solid var(--border-bright);
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  resize: vertical;
+  margin-bottom: 8px;
+}
+
+.notes-input-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.notes-input-controls input {
+  flex: 1;
+  background: #06090e;
+  border: 1px solid var(--border-bright);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+}
+
 /* Phase 8: Forensic Dossier Export Controls */
 .dossier-actions-bar {
   display: flex;
