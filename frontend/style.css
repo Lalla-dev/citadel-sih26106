@@ -1684,3 +1684,152 @@ body {
   color: var(--text-muted);
   background: var(--bg-surface);
 }
+
+/* ─── Citadel Info Tooltip System ─── */
+.citadel-tip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.citadel-tip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-style: normal;
+  color: var(--accent-blue);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  background: rgba(56, 189, 248, 0.1);
+  transition: all 0.2s ease;
+  line-height: 1;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.citadel-tip:hover,
+.citadel-tip.active {
+  z-index: 1000;
+}
+
+.citadel-tip:hover .citadel-tip-icon,
+.citadel-tip.active .citadel-tip-icon {
+  background: rgba(56, 189, 248, 0.28);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 8px var(--accent-glow);
+  transform: scale(1.1);
+}
+
+.citadel-tip-body {
+  display: none !important;
+  position: absolute;
+  z-index: 1000;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  max-width: 90vw;
+  padding: 14px 16px;
+  background: #0d1527;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 10px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85), 0 0 16px rgba(56, 189, 248, 0.2);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: #cbd5e1;
+  pointer-events: auto;
+  white-space: normal;
+  text-align: left;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* Arrow */
+.citadel-tip-body::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: #0d1527;
+}
+
+/* Show on hover (desktop) and on .active class (click/tap) */
+.citadel-tip:hover .citadel-tip-body,
+.citadel-tip.active .citadel-tip-body {
+  display: block !important;
+  animation: tipFadeIn 0.18s ease-out;
+}
+
+@keyframes tipFadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.citadel-tip-title {
+  font-weight: 700;
+  color: #f8fafc;
+  font-size: 0.84rem;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.citadel-tip-body p {
+  margin: 0 0 6px 0;
+  color: #94a3b8;
+  font-size: 0.77rem;
+  line-height: 1.5;
+}
+
+.citadel-tip-body p:last-child {
+  margin-bottom: 0;
+}
+
+.citadel-tip-why {
+  color: #38bdf8 !important;
+  font-weight: 600;
+  font-size: 0.75rem !important;
+}
+
+.citadel-tip-limitation {
+  color: #fbbf24 !important;
+  font-size: 0.73rem !important;
+  margin-top: 6px !important;
+  padding-top: 6px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* When tooltip would overflow top or is designated below, flip below */
+.citadel-tip.tip-below .citadel-tip-body {
+  bottom: auto;
+  top: calc(100% + 10px);
+}
+
+.citadel-tip.tip-below .citadel-tip-body::after {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: #0d1527;
+}
+
+/* Align right when tooltip is near right edge (e.g. in score cluster) */
+.citadel-tip.tip-left .citadel-tip-body {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+.citadel-tip.tip-left .citadel-tip-body::after {
+  left: auto;
+  right: 12px;
+  transform: none;
+}
+

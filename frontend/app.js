@@ -49,6 +49,25 @@ document.addEventListener('DOMContentLoaded', () => {
   initCaseQueue();
   loadCaseQueue();
 
+  // ─── Citadel Info Tooltip click/tap handler (mobile + accessibility) ───
+  document.addEventListener('click', (e) => {
+    const tipIcon = e.target.closest('.citadel-tip-icon');
+    if (tipIcon) {
+      e.preventDefault();
+      e.stopPropagation();
+      const tip = tipIcon.closest('.citadel-tip');
+      const wasActive = tip.classList.contains('active');
+      // Close all other open tooltips first
+      document.querySelectorAll('.citadel-tip.active').forEach(t => t.classList.remove('active'));
+      if (!wasActive) tip.classList.add('active');
+      return;
+    }
+    // Close any open tooltip when clicking elsewhere
+    if (!e.target.closest('.citadel-tip-body')) {
+      document.querySelectorAll('.citadel-tip.active').forEach(t => t.classList.remove('active'));
+    }
+  });
+
   function handleFileSelect(e) {
     const files = e.target.files;
     if (files.length > 0) {
@@ -135,10 +154,18 @@ document.addEventListener('DOMContentLoaded', () => {
     riskBadge.style.border = `1px solid ${colors.border}`;
 
     const confPercent = Math.round(data.confidence * 100);
-    const confBadge = document.getElementById('confidence-badge');
+    const confTextElem = document.getElementById('confidence-badge-text');
     const confLabel = data.ml_classification && data.ml_classification.ml_available ? 'Combined' : 'Heuristic';
-    confBadge.textContent = `${confLabel} Confidence: ${confPercent}%`;
-    confBadge.title = data.confidence_disclaimer || "Multi-indicator agreement; not a statistical ML probability.";
+    if (confTextElem) {
+      confTextElem.textContent = `${confLabel} Confidence: ${confPercent}%`;
+    } else {
+      const confBadge = document.getElementById('confidence-badge');
+      const confTip = confBadge ? confBadge.querySelector('.citadel-tip') : null;
+      if (confBadge) {
+        confBadge.textContent = `${confLabel} Confidence: ${confPercent}%`;
+        if (confTip) confBadge.appendChild(confTip);
+      }
+    }
 
     // 2b. ML Classification Card
     const ml = data.ml_classification || {};
@@ -1171,4 +1198,17 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
   }
+
+  // ─── Citadel Info Tooltip Click/Tap Support ───
+  document.addEventListener('click', (e) => {
+    const tip = e.target.closest('.citadel-tip');
+    // Dismiss all active tooltips except the one currently clicked
+    document.querySelectorAll('.citadel-tip.active').forEach(el => {
+      if (el !== tip) el.classList.remove('active');
+    });
+    if (tip && e.target.closest('.citadel-tip-icon')) {
+      tip.classList.toggle('active');
+    }
+  });
 });
+
