@@ -49,6 +49,80 @@ document.addEventListener('DOMContentLoaded', () => {
   initCaseQueue();
   loadCaseQueue();
 
+  // Initialize Minimal Sticky Product Navigation & Scroll Spy
+  initSectionNav();
+
+  function initSectionNav() {
+    const navLinks = document.querySelectorAll('.header-nav .nav-link');
+    if (!navLinks || navLinks.length === 0) return;
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const sectionId = link.getAttribute('data-section');
+        let targetElem = document.getElementById(sectionId);
+
+        // If results dashboard is not visible and user clicks a sub-section, scroll to hero/ingestion
+        if (resultsDashboard && resultsDashboard.style.display === 'none' && sectionId !== 'hero-overview-section') {
+          targetElem = document.getElementById('hero-overview-section');
+        }
+
+        if (targetElem) {
+          targetElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          navLinks.forEach(l => l.classList.remove('active'));
+          link.classList.add('active');
+        }
+      });
+    });
+
+    // Scroll spy using IntersectionObserver
+    const sectionIds = [
+      'hero-overview-section',
+      'investigation-section',
+      'intelligence-section',
+      'ai-nlp-section',
+      'threat-correlation-section',
+      'soc-response-section',
+      'forensics-section'
+    ];
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          navLinks.forEach(link => {
+            if (link.getAttribute('data-section') === id) {
+              link.classList.add('active');
+            } else {
+              link.classList.remove('active');
+            }
+          });
+        }
+      });
+    }, {
+      root: null,
+      rootMargin: '-20% 0px -55% 0px',
+      threshold: 0
+    });
+
+    sectionIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    window.addEventListener('scroll', () => {
+      if (window.scrollY < 120) {
+        navLinks.forEach(link => {
+          if (link.getAttribute('data-section') === 'hero-overview-section') {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+      }
+    }, { passive: true });
+  }
+
   // ─── Citadel Info Tooltip click/tap handler (mobile + accessibility) ───
   document.addEventListener('click', (e) => {
     const tipIcon = e.target.closest('.citadel-tip-icon');
@@ -793,7 +867,7 @@ document.addEventListener('DOMContentLoaded', () => {
         badge.textContent = 'INTEGRITY: VERIFIED';
         banner.className = 'integrity-banner-verified';
         icon.textContent = '✓';
-        headline.textContent = 'Cryptographic Chain of Custody Confirmed';
+        headline.textContent = 'Cryptographic Evidence Integrity Confirmed';
         detail.textContent = message;
         chkEv.className = 'check-pill check-pass'; chkEv.textContent = 'Evidence Hash: Match';
         chkVd.className = 'check-pill check-pass'; chkVd.textContent = 'Verdict Digest: Match';
@@ -828,7 +902,7 @@ document.addEventListener('DOMContentLoaded', () => {
       prevHashElem.textContent = (integ.previous_block_hash || '—').substring(0, 24) + '...';
       timeElem.textContent = integ.chain_of_custody_timestamp || '-';
 
-      setIntegrityStatus(true, "Cryptographic Chain of Custody Confirmed: Original RFC 5322 message bytes and forensic verdict match the append-only evidence ledger without tampering.");
+      setIntegrityStatus(true, "Cryptographic Evidence Integrity Confirmed: Original RFC 5322 message bytes and forensic verdict match the append-only evidence ledger without tampering.");
     } else {
       evHashElem.textContent = '—';
       vdHashElem.textContent = '—';
@@ -1079,8 +1153,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // Render Canvas
       ctx.clearRect(0, 0, width, height);
 
-      // Grid background
-      ctx.strokeStyle = 'rgba(30, 41, 59, 0.4)';
+      // Grid background (subtle light grid lines)
+      ctx.strokeStyle = '#f2f2f4';
       ctx.lineWidth = 1;
       for (let x = 0; x < width; x += 40) {
         ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
@@ -1096,12 +1170,12 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.lineTo(e.targetNode.x, e.targetNode.y);
         if (e.severity === 'CRITICAL') {
           ctx.strokeStyle = '#ef4444';
-          ctx.lineWidth = 2.5;
+          ctx.lineWidth = 2.2;
         } else if (e.severity === 'ALERT') {
           ctx.strokeStyle = '#f59e0b';
-          ctx.lineWidth = 2.0;
+          ctx.lineWidth = 1.8;
         } else {
-          ctx.strokeStyle = 'rgba(71, 85, 105, 0.6)';
+          ctx.strokeStyle = '#d2d2d7';
           ctx.lineWidth = 1.2;
         }
         ctx.stroke();
@@ -1109,7 +1183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Edge label (relationship)
         const midX = (e.sourceNode.x + e.targetNode.x) / 2;
         const midY = (e.sourceNode.y + e.targetNode.y) / 2;
-        ctx.fillStyle = '#64748b';
+        ctx.fillStyle = '#86868b';
         ctx.font = '9px "JetBrains Mono", monospace';
         ctx.textAlign = 'center';
         ctx.fillText(e.relationship, midX, midY - 3);
@@ -1121,17 +1195,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (n.risk === 'CRITICAL' || n === hoveredNode || n === selectedNode) {
           ctx.beginPath();
           ctx.arc(n.x, n.y, n.radius + 6, 0, 2 * Math.PI);
-          ctx.fillStyle = n.risk === 'CRITICAL' ? 'rgba(239, 68, 68, 0.25)' : 'rgba(56, 189, 248, 0.25)';
+          ctx.fillStyle = n.risk === 'CRITICAL' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(0, 113, 227, 0.15)';
           ctx.fill();
         }
 
         // Main circle
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.radius, 0, 2 * Math.PI);
-        ctx.fillStyle = n.color || '#64748b';
+        ctx.fillStyle = n.color || '#6e6e73';
         ctx.fill();
-        ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
         // Icon / Type code inside circle
@@ -1142,13 +1216,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const typeIcons = { 'EMAIL': '✉', 'SENDER': '👤', 'DOMAIN': '🌐', 'URL': '🔗', 'IP': '📍', 'ASN': '⚡', 'THREAT_ACTOR': '🚨' };
         ctx.fillText(typeIcons[n.type] || '•', n.x, n.y);
 
-        // Node Label
-        ctx.fillStyle = '#e2e8f0';
-        ctx.font = '10px Inter, sans-serif';
+        // Node Label (crisp dark charcoal for light background)
+        ctx.fillStyle = '#1d1d1f';
+        ctx.font = '10px -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif';
         ctx.textBaseline = 'top';
         const lines = (n.label || '').split('\n');
         lines.forEach((line, idx) => {
-          ctx.fillText(line, n.x, n.y + n.radius + 3 + (idx * 11));
+          ctx.fillText(line, n.x, n.y + n.radius + 4 + (idx * 12));
         });
       });
 

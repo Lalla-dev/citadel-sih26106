@@ -3,28 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Citadel // Email Threat Intelligence & BEC Detection</title>
-  <link rel="stylesheet" href="/static/style.css?v=3">
+  <title>Citadel // Email Threat Intelligence &amp; Forensic Defense</title>
+  <link rel="stylesheet" href="/static/style.css?v=apple_nav_v2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- Top Header Navigation -->
+  <!-- Top Sticky Navigation Bar -->
   <header class="app-header">
     <div class="header-brand">
       <div class="brand-shield">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           <path d="M9 12l2 2 4-4"/>
         </svg>
       </div>
       <div>
         <h1 class="brand-title">CITADEL</h1>
-        <span class="brand-subtitle">Email Threat Intelligence & BEC Defense Platform</span>
+        <span class="brand-subtitle">Email Threat Intelligence &amp; Forensic Defense</span>
       </div>
     </div>
+
+    <!-- Minimal Sticky Product Navigation (Smooth Section Anchors) -->
+    <nav class="header-nav" id="header-nav" aria-label="Section Navigation">
+      <a href="#hero-overview-section" class="nav-link active" data-section="hero-overview-section">Overview</a>
+      <a href="#investigation-section" class="nav-link" data-section="investigation-section">Investigation</a>
+      <a href="#intelligence-section" class="nav-link" data-section="intelligence-section">Intelligence</a>
+      <a href="#ai-nlp-section" class="nav-link" data-section="ai-nlp-section">AI / NLP</a>
+      <a href="#threat-correlation-section" class="nav-link" data-section="threat-correlation-section">Correlation</a>
+      <a href="#soc-response-section" class="nav-link" data-section="soc-response-section">SOC</a>
+      <a href="#forensics-section" class="nav-link" data-section="forensics-section">Forensics</a>
+    </nav>
 
     <div class="header-meta">
       <div class="meta-pill" id="case-id-pill">
@@ -34,173 +45,85 @@
       <div class="meta-pill">
         <span class="meta-label">SYSTEM:</span>
         <span class="status-dot green"></span>
-        <span class="meta-value">ACTIVE (PHASE 1 MVP)</span>
+        <span class="meta-value">ACTIVE (DEMO READY)</span>
       </div>
     </div>
   </header>
 
-  <!-- Main Container -->
+  <!-- Main Product Canvas Container -->
   <main class="app-layout">
-    
-    <!-- Ingestion & Quick Samples Panel -->
-    <section class="ingestion-section">
-      <div class="drop-zone" id="drop-zone">
-        <input type="file" id="file-input" accept=".eml,.txt" style="display: none;">
-        <div class="drop-content">
-          <svg class="drop-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
-          <div class="drop-text">
-            <strong>Drag & Drop .eml Email File</strong> or <button type="button" class="btn-link" id="browse-btn">Browse Local Files</button>
-          </div>
-          <span class="drop-sub">RFC 5322 MIME messages supported (.eml)</span>
-        </div>
+
+    <!-- ====================================================================
+         SECTION 1: HERO & INGESTION
+         "Detect threats. Understand the attack. Preserve the evidence."
+         ==================================================================== -->
+    <section class="citadel-section" id="hero-overview-section">
+      <div class="hero-product-block">
+        <h1 class="hero-product-title">CITADEL</h1>
+        <div class="hero-product-subtitle">AI-Powered Email Threat Detection &amp; Forensic Intelligence</div>
+        <div class="hero-product-tagline">&ldquo;Detect threats. Understand the attack. Preserve the evidence.&rdquo;</div>
       </div>
 
-      <div class="sample-picker">
-        <div class="picker-header">
-          <span class="picker-title">⚡ Research Test Scenarios (Synthetic Benchmark Data):</span>
-          <span class="picker-hint">Pre-configured synthetic test scenarios based on attack archetypes from reference papers</span>
-        </div>
-        <div class="sample-buttons" id="sample-buttons-container">
-          <!-- Dynamically populated sample buttons -->
-          <button class="sample-btn" data-file="benign_project_update.eml">
-            <span class="badge clean">BENIGN</span> Corporate Sync
-          </button>
-          <button class="sample-btn" data-file="credential_phishing_link.eml">
-            <span class="badge phish">PHISHING</span> Credential Alert Link
-          </button>
-          <button class="sample-btn" data-file="bec_ceo_wire_fraud.eml">
-            <span class="badge bec">BEC</span> CEO Wire Fraud
-          </button>
-          <button class="sample-btn" data-file="bec_invoice_bank_change.eml">
-            <span class="badge bec">BEC</span> Bogus Invoice Bank Change
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Phase 7: SOC Incident Triage Queue & Case Management -->
-    <section class="card triage-queue-card" id="triage-queue-section">
-      <div class="card-header queue-header">
-        <div class="queue-header-left">
-          <h3 class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
+      <!-- Ingestion Controls: Drop Zone + Curated Benchmark Scenarios -->
+      <div class="ingestion-section">
+        <div class="drop-zone" id="drop-zone">
+          <input type="file" id="file-input" accept=".eml,.txt" style="display: none;">
+          <div class="drop-content">
+            <svg class="drop-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
             </svg>
-            SOC Incident Triage Queue &amp; Case Management (Phase 7)
-          </h3>
-          <div class="queue-stats-badges" id="queue-stats-badges">
-            <span class="stat-pill" id="stat-total-cases">Cases: 0</span>
-            <span class="stat-pill stat-critical" id="stat-critical-cases">Critical/High: 0</span>
-            <span class="stat-pill stat-investigating" id="stat-investigating-cases">Active: 0</span>
-            <span class="stat-pill stat-contained" id="stat-contained-cases">Contained: 0</span>
-          </div>
-        </div>
-        <div class="queue-header-right">
-          <button class="btn-sample" id="btn-refresh-queue">🔄 Refresh Queue</button>
-        </div>
-      </div>
-
-      <!-- Queue Toolbar Filters -->
-      <div class="queue-toolbar">
-        <div class="search-input-wrap">
-          <input type="text" id="queue-search-input" placeholder="Filter by Case ID, Sender, Subject, Archetype..." class="queue-filter-input">
-        </div>
-        <div class="filter-dropdown-wrap">
-          <label>Status:</label>
-          <select id="queue-status-filter" class="queue-filter-select">
-            <option value="ALL">All Statuses</option>
-            <option value="NEW">NEW</option>
-            <option value="TRIAGED">TRIAGED</option>
-            <option value="INVESTIGATING">INVESTIGATING</option>
-            <option value="CONTAINED">CONTAINED</option>
-            <option value="RESOLVED">RESOLVED</option>
-            <option value="FALSE_POSITIVE">FALSE POSITIVE</option>
-          </select>
-        </div>
-        <div class="filter-dropdown-wrap">
-          <label>Risk Level:</label>
-          <select id="queue-risk-filter" class="queue-filter-select">
-            <option value="ALL">All Risk Levels</option>
-            <option value="CRITICAL">CRITICAL</option>
-            <option value="HIGH">HIGH</option>
-            <option value="MEDIUM">MEDIUM</option>
-            <option value="LOW">LOW</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Queue Table -->
-      <div class="queue-table-wrap">
-        <table class="queue-table">
-          <thead>
-            <tr>
-              <th>Case ID</th>
-              <th>Time (UTC)</th>
-              <th>Subject &amp; Sender</th>
-              <th>Score / Risk</th>
-              <th>Archetype</th>
-              <th>Lifecycle Status</th>
-              <th>Assigned Analyst</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="queue-table-body">
-            <tr>
-              <td colspan="8" class="queue-empty-msg">No cases recorded yet. Analyze an email above to populate the triage queue.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Notes Modal / Drawer (Inline) -->
-      <div id="case-notes-modal" class="notes-modal" style="display: none;">
-        <div class="notes-modal-content">
-          <div class="notes-modal-header">
-            <h4 id="notes-modal-title">Analyst Notes // Case</h4>
-            <button class="inspector-close-btn" id="notes-modal-close">&times;</button>
-          </div>
-          <div class="notes-history-list" id="notes-history-list">
-            <!-- Notes injected dynamically -->
-          </div>
-          <div class="notes-input-area">
-            <textarea id="new-note-text" placeholder="Add timestamped SOC investigation note (e.g. Quarantined on mail gateway, isolated endpoint)..." rows="3"></textarea>
-            <div class="notes-input-controls">
-              <input type="text" id="new-note-author" placeholder="Analyst Name" value="Tier-1 SOC Analyst">
-              <button class="btn-sample btn-dossier-primary" id="btn-save-note">💾 Save Note</button>
+            <div class="drop-text">
+              <strong>Drag &amp; drop .eml message file</strong> or <button type="button" class="btn-link" id="browse-btn">Browse Local Files</button>
             </div>
+            <span class="drop-sub">RFC 5322 MIME messages supported (.eml)</span>
+          </div>
+        </div>
+
+        <div class="sample-picker">
+          <div class="picker-header">
+            <span class="picker-title">⚡ Research Test Scenarios (Synthetic Benchmark Data)</span>
+            <span class="picker-hint">Pre-configured test scenarios based on attack archetypes from reference research</span>
+          </div>
+          <div class="sample-buttons" id="sample-buttons-container">
+            <button class="sample-btn" data-file="benign_project_update.eml">
+              <span class="badge clean">BENIGN</span> Corporate Project Sync
+            </button>
+            <button class="sample-btn" data-file="credential_phishing_link.eml">
+              <span class="badge phish">PHISHING</span> Credential Alert Link
+            </button>
+            <button class="sample-btn" data-file="bec_ceo_wire_fraud.eml">
+              <span class="badge bec">BEC</span> CEO Wire Fraud Transfer
+            </button>
+            <button class="sample-btn" data-file="bec_invoice_bank_change.eml">
+              <span class="badge bec">BEC</span> Bogus Invoice Bank Change
+            </button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Empty State Prompt -->
+    <!-- Empty State Placeholder (Visible before an email is analyzed) -->
     <div id="empty-state" class="state-placeholder">
       <div class="placeholder-card">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
           <polyline points="22,6 12,13 2,6"/>
         </svg>
         <h3>No Email Selected</h3>
-        <p>Drop an RFC 5322 <code>.eml</code> file above or select one of the pre-loaded research benchmark scenarios to begin forensic analysis.</p>
+        <p>Drop an RFC 5322 <code>.eml</code> file above or choose one of the pre-loaded research benchmark scenarios to begin forensic analysis.</p>
       </div>
     </div>
 
-    <!-- Live Analysis Dashboard (Hidden by default until email loaded) -->
-    <div id="results-dashboard" class="dashboard-grid" style="display: none;">
-      
-      <!-- Top Row: Executive Threat Verdict -->
-      <section class="card verdict-card">
+    <!-- Active Analysis Container (Hidden until email loaded) -->
+    <div id="results-dashboard" style="display: none; flex-direction: column; gap: 48px;">
+
+      <!-- Dominant Threat Verdict Banner -->
+      <section class="verdict-card">
         <div class="verdict-header">
           <div>
-            <span class="card-eyebrow">FORENSIC CASE OVERVIEW</span>
+            <span class="card-eyebrow">FORENSIC VERDICT OVERVIEW</span>
             <h2 class="verdict-archetype" id="threat-archetype">Evaluating...</h2>
             <div class="verdict-filename" id="verdict-filename">File: unnamed.eml</div>
             <div class="synthetic-tag" id="synthetic-scenario-tag" style="display: none;">
@@ -222,7 +145,7 @@
           </div>
         </div>
 
-        <!-- Phase 8: Forensic Dossier Export Controls -->
+        <!-- Dossier Export Controls -->
         <div class="dossier-actions-bar">
           <button class="btn-dossier btn-dossier-primary" id="btn-generate-report" title="Generate printable HTML forensic incident dossier">
             📄 Generate Forensic Report
@@ -236,400 +159,583 @@
         </div>
       </section>
 
-      <!-- Second Row: Headers & Auth vs Intent & Pretexting -->
-      <div class="two-col-row">
-        
-        <!-- Identity & Header Authentication Card -->
-        <section class="card">
+      <!-- ====================================================================
+           SECTION 2: INVESTIGATION
+           "Understand every signal."
+           ==================================================================== -->
+      <section class="citadel-section" id="investigation-section">
+        <div class="editorial-header">
+          <span class="editorial-eyebrow">INVESTIGATION</span>
+          <h2 class="editorial-title">Understand every signal.</h2>
+          <p class="editorial-desc">Examine sender alignment, header routing authentication, and social engineering pretexting indicators in clean rows.</p>
+        </div>
+
+        <div class="two-col-row">
+          <!-- Identity & Authentication Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                Header Authentication &amp; Identity Audit
+                <span class="citadel-tip tip-below" data-tip="spf-dkim-dmarc"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">SPF / DKIM / DMARC</span><p><strong>SPF</strong> checks if the sending server is authorised by the domain. <strong>DKIM</strong> verifies the message wasn't altered in transit using a cryptographic signature. <strong>DMARC</strong> ties SPF and DKIM together with a domain owner's policy.</p><p class="citadel-tip-why">Why it matters: Attackers often spoof legitimate sender domains; these protocols help detect forgeries.</p><p class="citadel-tip-limitation">⚠️ Limitation: Citadel parses these values from existing email headers — it does NOT perform live DNS lookups to independently verify them.</p></span></span>
+              </h3>
+              <span class="auth-notice-tag">Parsed Headers Only</span>
+            </div>
+
+            <div class="auth-banner-callout">
+              ⚠️ <strong>Static Header Parsing:</strong> SPF, DKIM, and DMARC statuses are extracted directly from message headers (Received-SPF / Authentication-Results). They are <strong>NOT</strong> independently verified via live DNS lookup.
+            </div>
+
+            <div class="metadata-table">
+              <div class="meta-row">
+                <span class="meta-k">Subject:</span>
+                <span class="meta-v highlight" id="meta-subject">-</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">From:</span>
+                <span class="meta-v" id="meta-from">-</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Reply-To:</span>
+                <span class="meta-v" id="meta-reply-to">-</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Return-Path:</span>
+                <span class="meta-v" id="meta-return-path">-</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-k">Date:</span>
+                <span class="meta-v" id="meta-date">-</span>
+              </div>
+            </div>
+
+            <!-- Protocol Badges -->
+            <div class="auth-grid">
+              <div class="auth-box" id="auth-box-spf">
+                <span class="auth-protocol">SPF (Parsed)</span>
+                <span class="auth-status" id="spf-status">NONE</span>
+              </div>
+              <div class="auth-box" id="auth-box-dkim">
+                <span class="auth-protocol">DKIM (Parsed)</span>
+                <span class="auth-status" id="dkim-status">NONE</span>
+              </div>
+              <div class="auth-box" id="auth-box-dmarc">
+                <span class="auth-protocol">DMARC (Parsed)</span>
+                <span class="auth-status" id="dmarc-status">NONE</span>
+              </div>
+            </div>
+
+            <!-- Identity Spoofing Alerts -->
+            <div id="spoof-alerts-container" class="spoof-alerts-list"></div>
+          </div>
+
+          <!-- Social Engineering & Intent Radar -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Social Engineering &amp; BEC Intent Radar
+              </h3>
+              <span class="card-meta-tag" id="intent-score-badge">Intent Score: 0/100</span>
+            </div>
+
+            <div class="intent-categories">
+              <!-- Financial Wire Pretexting -->
+              <div class="intent-item" id="intent-item-financial">
+                <div class="intent-title-bar">
+                  <span class="intent-name">Financial Transaction / Banking Alteration</span>
+                  <span class="intent-status-pill" id="financial-flag">NO</span>
+                </div>
+                <div class="keyword-tags" id="financial-keywords">None detected</div>
+              </div>
+
+              <!-- Urgency & Coercion -->
+              <div class="intent-item" id="intent-item-urgency">
+                <div class="intent-title-bar">
+                  <span class="intent-name">Urgency &amp; Coercive Deadline</span>
+                  <span class="intent-status-pill" id="urgency-flag">NO</span>
+                </div>
+                <div class="keyword-tags" id="urgency-keywords">None detected</div>
+              </div>
+
+              <!-- Authority Pretexting -->
+              <div class="intent-item" id="intent-item-authority">
+                <div class="intent-title-bar">
+                  <span class="intent-name">Executive Authority &amp; Confidentiality</span>
+                  <span class="intent-status-pill" id="authority-flag">NO</span>
+                </div>
+                <div class="keyword-tags" id="authority-keywords">None detected</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECTION 3: INTELLIGENCE
+           "Follow the evidence."
+           ==================================================================== -->
+      <section class="citadel-section" id="intelligence-section">
+        <div class="editorial-header">
+          <span class="editorial-eyebrow">INTELLIGENCE</span>
+          <h2 class="editorial-title">Follow the evidence.</h2>
+          <p class="editorial-desc">Inspect extracted URL tokens, mathematical Shannon entropy, domain reputation scores, GeoIP routing origins, and autonomous system numbers.</p>
+        </div>
+
+        <!-- URL & Domain Intelligence Table -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <h3 class="card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+              Extracted URLs &amp; Shannon Entropy Analysis
+            </h3>
+            <span class="card-meta-tag" id="url-count-tag">0 URLs Extracted</span>
+          </div>
+
+          <div id="url-table-wrapper" style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Extracted URL</th>
+                  <th>Domain / Host</th>
+                  <th>Entropy ($H$)<span class="citadel-tip tip-below" data-tip="shannon-entropy"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Shannon Entropy</span><p>A mathematical measure of randomness in a URL string. Legitimate URLs tend to be readable; phishing URLs often use randomised characters that produce high entropy.</p><p class="citadel-tip-why">Why it matters: High-entropy URLs (e.g. <code>a8f3x9q2.xyz/k1m</code>) are a strong indicator of machine-generated phishing infrastructure.</p></span></span></th>
+                  <th>Structural Anomaly Flags</th>
+                  <th>Risk Score</th>
+                  <th>Verdict</th>
+                </tr>
+              </thead>
+              <tbody id="url-table-body">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Domain Intelligence, GeoIP & ASN Enrichment -->
+        <div class="card" id="enrichment-card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              Domain Reputation, GeoIP &amp; ASN Infrastructure
+              <span class="citadel-tip tip-below" data-tip="ioc-threat-intel"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">IOC / Threat Intelligence</span><p><strong>IOC</strong> (Indicator of Compromise) is any domain, IP address, or sender address linked to known attacks. <strong>Threat Intelligence</strong> cross-references these IOCs against curated feeds of known adversary infrastructure.</p><p class="citadel-tip-why">Why it matters: Matching a single IOC can immediately confirm an email is part of a known attack campaign.</p><p class="citadel-tip-limitation">⚠️ Limitation: Citadel currently uses a curated offline IOC feed for demonstration — not a live commercial threat intelligence API.</p></span></span>
+              <span class="citadel-tip tip-below" data-tip="geoip"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">GeoIP (Geographic Mapping)</span><p>Associates an IP address with approximate geographic information to help identify routing origins.</p><p class="citadel-tip-why">Why it matters: Helps detect anomalies when email delivery infrastructure originates from regions inconsistent with the alleged sender organization.</p><p class="citadel-tip-limitation">⚠️ Demonstration Dataset: Citadel currently uses an offline demonstration dataset providing approximate geographic information rather than live city or coordinate geolocation services.</p></span></span>
+              <span class="citadel-tip tip-below" data-tip="asn"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">ASN (Autonomous System Number)</span><p>A globally unique number identifying a network operator or hosting provider (e.g. AWS, Microsoft Azure, Cloudflare, or consumer ISPs).</p><p class="citadel-tip-why">Why it matters: Reveals whether an email originated from legitimate enterprise mail networks, public cloud VPS, or bulletproof hosting providers.</p><p class="citadel-tip-limitation">⚠️ Limitation: Mapped from static demonstration datasets in this prototype.</p></span></span>
+            </h3>
+            <span class="card-meta-tag" id="enrichment-count-tag">0 Domains Analyzed</span>
+          </div>
+          <div id="enrichment-content">
+            <div class="empty-url-notice">No domain enrichment data yet. Analyze an email to see results.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECTION 4: AI / NLP
+           "Go beyond the obvious."
+           ==================================================================== -->
+      <section class="citadel-section" id="ai-nlp-section">
+        <div class="editorial-header">
+          <span class="editorial-eyebrow">AI &amp; NATURAL LANGUAGE PROCESSING</span>
+          <h2 class="editorial-title">Go beyond the obvious.</h2>
+          <p class="editorial-desc">Combine statistical n-gram machine learning with contextual semantic vector alignment and psychological coercion indexing.</p>
+        </div>
+
+        <div class="two-col-row">
+          <!-- ML Classification Card -->
+          <div class="card" id="ml-card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+                ML Text Classification
+                <span class="citadel-tip tip-below" data-tip="ml-classification"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">ML Classification (TF-IDF + Logistic Regression)</span><p><strong>TF-IDF</strong> converts email text into numerical importance scores for each word. <strong>Logistic Regression</strong> uses those scores to predict whether the email is benign, phishing, or a BEC attack.</p><p class="citadel-tip-why">Why it matters: Machine learning catches subtle textual patterns that handwritten rules might miss.</p><p class="citadel-tip-limitation">⚠️ Limitation: The current model is trained on a synthetic benchmark corpus, not a verified public dataset. Probabilities complement — but do not replace — the heuristic engine.</p></span></span>
+              </h3>
+              <span class="auth-notice-tag" id="ml-status-tag">ML Engine: Loading...</span>
+            </div>
+
+            <div class="ml-grid">
+              <div class="ml-prediction-box">
+                <span class="ml-label">Predicted Class</span>
+                <span class="ml-value" id="ml-predicted-label">—</span>
+              </div>
+              <div class="ml-prediction-box">
+                <span class="ml-label">Confidence</span>
+                <span class="ml-value" id="ml-confidence-val">—</span>
+              </div>
+              <div class="ml-prob-bars" id="ml-prob-bars">
+                <div class="prob-row"><span class="prob-name">Benign</span><div class="prob-track"><div class="prob-fill benign-fill" id="prob-benign" style="width:0%"></div></div><span class="prob-pct" id="prob-benign-pct">0%</span></div>
+                <div class="prob-row"><span class="prob-name">Phishing</span><div class="prob-track"><div class="prob-fill phishing-fill" id="prob-phishing" style="width:0%"></div></div><span class="prob-pct" id="prob-phishing-pct">0%</span></div>
+                <div class="prob-row"><span class="prob-name">BEC</span><div class="prob-track"><div class="prob-fill bec-fill" id="prob-bec" style="width:0%"></div></div><span class="prob-pct" id="prob-bec-pct">0%</span></div>
+              </div>
+            </div>
+            <div class="ml-disclaimer">Trained on synthetic benchmark corpus. Probabilities complement the heuristic engine and do NOT represent standalone production accuracy.</div>
+          </div>
+
+          <!-- Contextual NLP & Semantic Pretexting Radar -->
+          <div class="card" id="nlp-card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+                Contextual NLP &amp; Semantic Pretexting
+                <span class="citadel-tip tip-below" data-tip="nlp-engine"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Contextual NLP Engine</span><p>Analyses the meaning and intent of email text by comparing it against known attack templates (CEO fraud, invoice fraud, credential phishing) using cosine similarity — a technique that measures how closely two texts match in meaning.</p><p class="citadel-tip-why">Why it matters: Goes beyond keyword matching to detect sophisticated social engineering that uses novel phrasing.</p><p class="citadel-tip-limitation">⚠️ Limitation: Uses a statistical TF-IDF vectoriser with curated archetype anchors, not a live transformer neural network (e.g. RoBERTa).</p></span></span>
+              </h3>
+              <span class="auth-notice-tag" id="nlp-status-tag">Engine: Semantic Vector Alignment</span>
+            </div>
+
+            <div class="nlp-grid">
+              <div class="nlp-metric-card">
+                <span class="ml-label">Pretext Archetype</span>
+                <span class="nlp-archetype-value" id="nlp-dominant-archetype">—</span>
+                <span class="nlp-tone-badge" id="nlp-tone">—</span>
+              </div>
+              <div class="nlp-metric-card">
+                <span class="ml-label">Coercion Index<span class="citadel-tip" data-tip="coercion-index"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Psychological Coercion Index</span><p>Measures pressure tactics in an email — such as urgency, authority claims, isolation demands, and intimidation. Higher values (0.0–1.0) indicate stronger coercive language.</p><p class="citadel-tip-why">Why it matters: Attackers often use psychological pressure to make victims act without verifying the request.</p></span></span></span>
+                <span class="nlp-coercion-value" id="nlp-coercion-val">0.0</span>
+                <span class="table-badge" id="nlp-coercion-level">LOW</span>
+              </div>
+              <div class="nlp-sim-bars" id="nlp-sim-bars">
+                <div class="prob-row"><span class="prob-name" style="width:105px;">CEO Fraud</span><div class="prob-track"><div class="prob-fill bec-fill" id="sim-ceo" style="width:0%"></div></div><span class="prob-pct" id="sim-ceo-pct">0.00</span></div>
+                <div class="prob-row"><span class="prob-name" style="width:105px;">Invoice Alteration</span><div class="prob-track"><div class="prob-fill phishing-fill" id="sim-invoice" style="width:0%"></div></div><span class="prob-pct" id="sim-invoice-pct">0.00</span></div>
+                <div class="prob-row"><span class="prob-name" style="width:105px;">Credential Phish</span><div class="prob-track"><div class="prob-fill phishing-fill" id="sim-cred" style="width:0%"></div></div><span class="prob-pct" id="sim-cred-pct">0.00</span></div>
+                <div class="prob-row"><span class="prob-name" style="width:105px;">Benign Collab</span><div class="prob-track"><div class="prob-fill benign-fill" id="sim-benign" style="width:0%"></div></div><span class="prob-pct" id="sim-benign-pct">0.00</span></div>
+              </div>
+            </div>
+            <div class="ml-disclaimer">Contextual semantic cosine alignment against curated threat archetypes; evaluates coercive urgency, isolation, and authority pretexting velocity.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECTION 5: THREAT CORRELATION
+           "See the attack surface."
+           ==================================================================== -->
+      <section class="citadel-section" id="threat-correlation-section">
+        <div class="editorial-header">
+          <span class="editorial-eyebrow">THREAT CORRELATION</span>
+          <h2 class="editorial-title">See the attack surface.</h2>
+          <p class="editorial-desc">A unified interactive topological graph connecting sender identities, malicious infrastructure, domain routing, and campaign actors with generous focus.</p>
+        </div>
+
+        <div class="card" id="threat-graph-card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+              Force-Directed Threat Correlation Graph
+              <span class="citadel-tip tip-below" data-tip="threat-graph"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Threat Correlation Graph</span><p>A visual network map that connects all entities extracted from the email — sender, domains, URLs, IP addresses, ASN infrastructure, and known threat actors — into an interactive force-directed graph.</p><p class="citadel-tip-why">Why it matters: Seeing relationships between entities helps SOC analysts quickly understand an attacker's infrastructure and trace the full kill chain.</p></span></span>
+            </h3>
+            <div class="graph-header-controls">
+              <span class="card-meta-tag" id="graph-nodes-count">0 Entities Correlated</span>
+              <button class="btn-sample" id="graph-reset-btn" style="padding:4px 10px; font-size:0.75rem;">⟲ Reset Physics</button>
+            </div>
+          </div>
+
+          <div class="graph-legend">
+            <span class="legend-item"><span class="legend-dot" style="background:#0071e3"></span>Email Case</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span>Sender Identity</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#0284c7"></span>Domain</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#d97706"></span>Extracted URL</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#dc2626"></span>Resolved IP</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#10b981"></span>Routing ASN</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#991b1b"></span>Threat Actor</span>
+          </div>
+
+          <div class="threat-graph-wrapper">
+            <canvas id="threat-graph-canvas" width="1120" height="420"></canvas>
+            <div id="graph-node-inspector" class="graph-inspector-panel">
+              <div class="inspector-header">
+                <span id="inspector-title">Entity Dossier</span>
+                <button id="inspector-close" class="inspector-close-btn">&times;</button>
+              </div>
+              <div id="inspector-body" class="inspector-body">Click on any graph node to inspect live entity metadata.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECTION 6: SOC RESPONSE
+           "Turn detection into action."
+           ==================================================================== -->
+      <section class="citadel-section" id="soc-response-section">
+        <div class="editorial-header">
+          <span class="editorial-eyebrow">INCIDENT RESPONSE &amp; WORKFLOW</span>
+          <h2 class="editorial-title">Turn detection into action.</h2>
+          <p class="editorial-desc">Triage incoming alerts, update investigation lifecycle statuses, record timestamped analyst notes, and follow actionable SOC response playbooks.</p>
+        </div>
+
+        <!-- SOC Incident Triage Queue Card -->
+        <div class="card triage-queue-card" id="triage-queue-section">
+          <div class="card-header queue-header">
+            <div class="queue-header-left">
+              <h3 class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+                SOC Incident Triage Queue &amp; Case Management
+              </h3>
+              <div class="queue-stats-badges" id="queue-stats-badges">
+                <span class="stat-pill" id="stat-total-cases">Cases: 0</span>
+                <span class="stat-pill stat-critical" id="stat-critical-cases">Critical/High: 0</span>
+                <span class="stat-pill stat-investigating" id="stat-investigating-cases">Active: 0</span>
+                <span class="stat-pill stat-contained" id="stat-contained-cases">Contained: 0</span>
+              </div>
+            </div>
+            <div class="queue-header-right">
+              <button class="btn-sample" id="btn-refresh-queue">🔄 Refresh Queue</button>
+            </div>
+          </div>
+
+          <!-- Queue Toolbar Filters -->
+          <div class="queue-toolbar">
+            <div class="search-input-wrap">
+              <input type="text" id="queue-search-input" placeholder="Filter by Case ID, Sender, Subject, Archetype..." class="queue-filter-input">
+            </div>
+            <div class="filter-dropdown-wrap">
+              <label>Status:</label>
+              <select id="queue-status-filter" class="queue-filter-select">
+                <option value="ALL">All Statuses</option>
+                <option value="NEW">NEW</option>
+                <option value="TRIAGED">TRIAGED</option>
+                <option value="INVESTIGATING">INVESTIGATING</option>
+                <option value="CONTAINED">CONTAINED</option>
+                <option value="RESOLVED">RESOLVED</option>
+                <option value="FALSE_POSITIVE">FALSE POSITIVE</option>
+              </select>
+            </div>
+            <div class="filter-dropdown-wrap">
+              <label>Risk Level:</label>
+              <select id="queue-risk-filter" class="queue-filter-select">
+                <option value="ALL">All Risk Levels</option>
+                <option value="CRITICAL">CRITICAL</option>
+                <option value="HIGH">HIGH</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="LOW">LOW</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Queue Table -->
+          <div class="queue-table-wrap">
+            <table class="queue-table">
+              <thead>
+                <tr>
+                  <th>Case ID</th>
+                  <th>Time (UTC)</th>
+                  <th>Subject &amp; Sender</th>
+                  <th>Score / Risk</th>
+                  <th>Archetype</th>
+                  <th>Lifecycle Status</th>
+                  <th>Assigned Analyst</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="queue-table-body">
+                <tr>
+                  <td colspan="8" class="queue-empty-msg">No cases recorded yet. Analyze an email above to populate the triage queue.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Notes Modal -->
+          <div id="case-notes-modal" class="notes-modal" style="display: none;">
+            <div class="notes-modal-content">
+              <div class="notes-modal-header">
+                <h4 id="notes-modal-title">Analyst Notes // Case</h4>
+                <button class="inspector-close-btn" id="notes-modal-close">&times;</button>
+              </div>
+              <div class="notes-history-list" id="notes-history-list"></div>
+              <div class="notes-input-area">
+                <textarea id="new-note-text" placeholder="Add timestamped SOC investigation note (e.g. Quarantined on mail gateway, isolated endpoint)..." rows="3"></textarea>
+                <div class="notes-input-controls">
+                  <input type="text" id="new-note-author" placeholder="Analyst Name" value="Tier-1 SOC Analyst">
+                  <button class="btn-sample btn-dossier-primary" id="btn-save-note">💾 Save Note</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detection Reasoning & Playbook Actions -->
+        <div class="two-col-row">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                Detection Reasoning &amp; Risk Factors
+              </h3>
+            </div>
+            <div class="reasons-list" id="reasons-list"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+                Actionable SOC Response Playbook
+              </h3>
+            </div>
+            <ul class="action-checklist" id="actions-list"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECTION 7: FORENSICS
+           "Preserve what happened."
+           ==================================================================== -->
+      <section class="citadel-section" id="forensics-section">
+        <div class="editorial-header">
+          <span class="editorial-eyebrow">CRYPTOGRAPHIC EVIDENCE INTEGRITY</span>
+          <h2 class="editorial-title">Preserve what happened.</h2>
+          <p class="editorial-desc">Anchor raw RFC 5322 message bytes and detection verdicts to an append-only cryptographic Merkle evidence ledger to ensure tamper detection.</p>
+        </div>
+
+        <!-- Evidence Integrity Card -->
+        <div class="card" id="integrity-card" style="margin-bottom: 24px;">
           <div class="card-header">
             <h3 class="card-title">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
               </svg>
-              Header Authentication & Identity Audit<span class="citadel-tip tip-below" data-tip="spf-dkim-dmarc"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">SPF / DKIM / DMARC</span><p><strong>SPF</strong> checks if the sending server is authorised by the domain. <strong>DKIM</strong> verifies the message wasn't altered in transit using a cryptographic signature. <strong>DMARC</strong> ties SPF and DKIM together with a domain owner's policy.</p><p class="citadel-tip-why">Why it matters: Attackers often spoof legitimate sender domains; these protocols help detect forgeries.</p><p class="citadel-tip-limitation">⚠️ Limitation: Citadel parses these values from existing email headers — it does NOT perform live DNS lookups to independently verify them.</p></span></span>
+              Cryptographic Evidence Integrity &amp; Merkle Evidence Ledger
+              <span class="citadel-tip tip-below" data-tip="merkle-ledger"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Merkle Evidence Ledger</span><p>An append-only chain of cryptographic blocks where each entry stores the SHA-256 hash of the evidence and links to the previous block.</p><p class="citadel-tip-why">Why it matters: Cryptographic hash links make unauthorized changes to the evidence or detection verdict detectable.</p><p class="citadel-tip-limitation">⚠️ Implementation Note: The current implementation is a local in-memory tamper-evident ledger for prototype verification, not a distributed blockchain.</p></span></span>
             </h3>
-            <span class="auth-notice-tag">
-              Parsed Headers Only
-            </span>
-          </div>
-
-          <div class="auth-banner-callout">
-            ⚠️ <strong>Static Header Parsing:</strong> SPF, DKIM, and DMARC statuses are extracted directly from message headers (Received-SPF / Authentication-Results). They are <strong>NOT</strong> independently verified via live DNS lookup.
-          </div>
-
-          <div class="metadata-table">
-            <div class="meta-row">
-              <span class="meta-k">Subject:</span>
-              <span class="meta-v highlight" id="meta-subject">-</span>
-            </div>
-            <div class="meta-row">
-              <span class="meta-k">From:</span>
-              <span class="meta-v" id="meta-from">-</span>
-            </div>
-            <div class="meta-row">
-              <span class="meta-k">Reply-To:</span>
-              <span class="meta-v" id="meta-reply-to">-</span>
-            </div>
-            <div class="meta-row">
-              <span class="meta-k">Return-Path:</span>
-              <span class="meta-v" id="meta-return-path">-</span>
-            </div>
-            <div class="meta-row">
-              <span class="meta-k">Date:</span>
-              <span class="meta-v" id="meta-date">-</span>
+            <div class="integrity-header-controls">
+              <span class="integrity-badge badge-verified" id="integrity-status-badge">INTEGRITY: VERIFIED</span>
+              <button class="btn-sample" id="btn-verify-integrity">🛡️ Verify Integrity</button>
+              <button class="btn-sample btn-tamper" id="btn-simulate-tamper" title="Simulate evidence modification to demonstrate tamper detection">⚡ Test Tamper</button>
             </div>
           </div>
 
-          <!-- Protocol Authentication Badges -->
-          <div class="auth-grid">
-            <div class="auth-box" id="auth-box-spf">
-              <span class="auth-protocol">SPF (Parsed)</span>
-              <span class="auth-status" id="spf-status">NONE</span>
+          <div class="integrity-grid">
+            <!-- Evidence SHA-256 Box -->
+            <div class="integrity-metric-card">
+              <div class="integrity-card-label">Original Evidence SHA-256 (Raw RFC 5322 Bytes)<span class="citadel-tip" data-tip="sha256"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">SHA-256</span><p>A cryptographic fingerprint that produces a unique 64-character code from any data. Even a single-byte change in the original email will produce a completely different fingerprint.</p><p class="citadel-tip-why">Why it matters: Creates a cryptographic fingerprint of the raw RFC 5322 email bytes, allowing changes to the email bytes to be detected.</p></span></span></div>
+              <div class="integrity-hash-box">
+                <code id="integrity-evidence-sha256">—</code>
+              </div>
+              <div class="integrity-subtext">Hashed from exact uploaded bytes prior to parsing; creates a unique fingerprint to detect changes.</div>
             </div>
-            <div class="auth-box" id="auth-box-dkim">
-              <span class="auth-protocol">DKIM (Parsed)</span>
-              <span class="auth-status" id="dkim-status">NONE</span>
+
+            <!-- Verdict & Headers SHA-256 Box -->
+            <div class="integrity-metric-card">
+              <div class="integrity-card-label">Verdict &amp; Header Digest (Canonical SHA-256)</div>
+              <div class="integrity-hash-box">
+                <code id="integrity-verdict-sha256">—</code>
+              </div>
+              <div class="integrity-subtext">Canonical digest binding detected score, risk level, archetype, and routing headers.</div>
             </div>
-            <div class="auth-box" id="auth-box-dmarc">
-              <span class="auth-protocol">DMARC (Parsed)</span>
-              <span class="auth-status" id="dmarc-status">NONE</span>
+
+            <!-- Ledger Block Anchor Box -->
+            <div class="integrity-metric-card">
+              <div class="integrity-card-label">Append-Only Cryptographic Ledger Anchor</div>
+              <div class="ledger-anchor-info">
+                <div><strong>Ledger Block:</strong> <span id="ledger-block-idx">#0</span></div>
+                <div><strong>Merkle Root:</strong> <code id="ledger-merkle-root">—</code></div>
+                <div><strong>Block Hash:</strong> <code id="ledger-block-hash">—</code></div>
+                <div><strong>Previous Block:</strong> <code id="ledger-prev-hash">—</code></div>
+                <div><strong>Ledger Timestamp:</strong> <span id="ledger-timestamp">—</span></div>
+              </div>
             </div>
           </div>
 
-          <!-- Identity Spoofing Alerts -->
-          <div id="spoof-alerts-container" class="spoof-alerts-list">
-            <!-- Spoofing details injected here -->
+          <!-- Verification Checklist Banner -->
+          <div id="integrity-verification-banner" class="integrity-banner-verified">
+            <div class="integrity-banner-title">
+              <span id="verification-icon">✓</span>
+              <span id="verification-headline">Cryptographic Evidence Integrity Confirmed</span>
+            </div>
+            <div class="integrity-checks-row" id="verification-checks-row">
+              <span class="check-pill check-pass" id="chk-evidence">Evidence Hash: Match</span>
+              <span class="check-pill check-pass" id="chk-verdict">Verdict Digest: Match</span>
+              <span class="check-pill check-pass" id="chk-merkle">Merkle Tree Root: Valid</span>
+              <span class="check-pill check-pass" id="chk-ledger">Ledger Chain Linkage: Intact</span>
+            </div>
+            <div class="integrity-banner-detail" id="verification-detail">
+              Original RFC 5322 message bytes and detection verdict match the append-only cryptographic evidence ledger without tampering.
+            </div>
           </div>
-        </section>
+        </div>
 
-        <!-- Intent & Social Engineering Card (Paper 2 Taxonomy) -->
-        <section class="card">
+        <!-- Normalized Message Body Inspection -->
+        <div class="card">
           <div class="card-header">
             <h3 class="card-title">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
               </svg>
-              Social Engineering & BEC Intent Radar
+              Normalized Message Body Inspection
             </h3>
-            <span class="card-meta-tag" id="intent-score-badge">Intent Score: 0/100</span>
           </div>
+          <div class="body-preview" id="email-body-preview">(No content)</div>
+        </div>
+      </section>
 
-          <div class="intent-categories">
-            <!-- Financial Wire Pretexting -->
-            <div class="intent-item" id="intent-item-financial">
-              <div class="intent-title-bar">
-                <span class="intent-name">Financial Transaction / Banking Alteration</span>
-                <span class="intent-status-pill" id="financial-flag">NO</span>
-              </div>
-              <div class="keyword-tags" id="financial-keywords">None detected</div>
-            </div>
+    </div><!-- /results-dashboard -->
 
-            <!-- Urgency & Coercion -->
-            <div class="intent-item" id="intent-item-urgency">
-              <div class="intent-title-bar">
-                <span class="intent-name">Urgency & Coercive Deadline</span>
-                <span class="intent-status-pill" id="urgency-flag">NO</span>
-              </div>
-              <div class="keyword-tags" id="urgency-keywords">None detected</div>
-            </div>
-
-            <!-- Authority Pretexting -->
-            <div class="intent-item" id="intent-item-authority">
-              <div class="intent-title-bar">
-                <span class="intent-name">Executive Authority & Confidentiality</span>
-                <span class="intent-status-pill" id="authority-flag">NO</span>
-              </div>
-              <div class="keyword-tags" id="authority-keywords">None detected</div>
-            </div>
-          </div>
-        </section>
+    <!-- ====================================================================
+         SECTION 8: FINAL SUMMARY & WORKFLOW PIPELINE
+         "From suspicious email to forensic evidence."
+         ==================================================================== -->
+    <section class="summary-block">
+      <h3 class="summary-headline">From suspicious email to forensic evidence.</h3>
+      <div class="pipeline-flow">
+        <span class="pipeline-step">Analyze</span>
+        <span class="pipeline-arrow">→</span>
+        <span class="pipeline-step">Correlate</span>
+        <span class="pipeline-arrow">→</span>
+        <span class="pipeline-step">Investigate</span>
+        <span class="pipeline-arrow">→</span>
+        <span class="pipeline-step">Preserve</span>
       </div>
+    </section>
 
-      <!-- ML Classification Card (Phase 2: TF-IDF + Logistic Regression) -->
-      <section class="card" id="ml-card">
-        <div class="card-header">
-          <h3 class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-            </svg>
-            ML Text Classification<span class="citadel-tip tip-below" data-tip="ml-classification"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">ML Classification (TF-IDF + Logistic Regression)</span><p><strong>TF-IDF</strong> converts email text into numerical importance scores for each word. <strong>Logistic Regression</strong> uses those scores to predict whether the email is benign, phishing, or a BEC attack.</p><p class="citadel-tip-why">Why it matters: Machine learning catches subtle textual patterns that handwritten rules might miss.</p><p class="citadel-tip-limitation">⚠️ Limitation: The current model is trained on a synthetic benchmark corpus, not a verified public dataset. Probabilities complement — but do not replace — the heuristic engine.</p></span></span>
-          </h3>
-          <span class="auth-notice-tag" id="ml-status-tag">ML Engine: Loading...</span>
-        </div>
-        <div class="ml-grid">
-          <div class="ml-prediction-box">
-            <span class="ml-label">Predicted Class</span>
-            <span class="ml-value" id="ml-predicted-label">—</span>
-          </div>
-          <div class="ml-prediction-box">
-            <span class="ml-label">ML Confidence</span>
-            <span class="ml-value" id="ml-confidence-val">—</span>
-          </div>
-          <div class="ml-prob-bars" id="ml-prob-bars">
-            <div class="prob-row"><span class="prob-name">Benign</span><div class="prob-track"><div class="prob-fill benign-fill" id="prob-benign" style="width:0%"></div></div><span class="prob-pct" id="prob-benign-pct">0%</span></div>
-            <div class="prob-row"><span class="prob-name">Phishing</span><div class="prob-track"><div class="prob-fill phishing-fill" id="prob-phishing" style="width:0%"></div></div><span class="prob-pct" id="prob-phishing-pct">0%</span></div>
-            <div class="prob-row"><span class="prob-name">BEC</span><div class="prob-track"><div class="prob-fill bec-fill" id="prob-bec" style="width:0%"></div></div><span class="prob-pct" id="prob-bec-pct">0%</span></div>
-          </div>
-        </div>
-        <div class="ml-disclaimer">Trained on synthetic benchmark corpus. Probabilities complement the heuristic engine and do NOT represent standalone production accuracy.</div>
-      </section>
-
-      <!-- Contextual NLP & Semantic Pretexting Radar (Phase 4: DistilBERT/RoBERTa-Aligned Engine) -->
-      <section class="card" id="nlp-card">
-        <div class="card-header">
-          <h3 class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
-            </svg>
-            Contextual NLP &amp; Semantic Pretexting Radar (Phase 4)<span class="citadel-tip tip-below" data-tip="nlp-engine"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Contextual NLP Engine</span><p>Analyses the meaning and intent of email text by comparing it against known attack templates (CEO fraud, invoice fraud, credential phishing) using cosine similarity — a technique that measures how closely two texts match in meaning.</p><p class="citadel-tip-why">Why it matters: Goes beyond keyword matching to detect sophisticated social engineering that uses novel phrasing.</p><p class="citadel-tip-limitation">⚠️ Limitation: Uses a statistical TF-IDF vectoriser with curated archetype anchors, not a live transformer neural network (e.g. RoBERTa).</p></span></span>
-          </h3>
-          <span class="auth-notice-tag" id="nlp-status-tag">Engine: Semantic Vector Alignment</span>
-        </div>
-        <div class="nlp-grid">
-          <div class="nlp-metric-card">
-            <span class="ml-label">Dominant Pretext Archetype</span>
-            <span class="nlp-archetype-value" id="nlp-dominant-archetype">—</span>
-            <span class="nlp-tone-badge" id="nlp-tone">—</span>
-          </div>
-          <div class="nlp-metric-card">
-            <span class="ml-label">Psychological Coercion Index<span class="citadel-tip" data-tip="coercion-index"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Psychological Coercion Index</span><p>Measures pressure tactics in an email — such as urgency, authority claims, isolation demands, and intimidation. Higher values (0.0–1.0) indicate stronger coercive language.</p><p class="citadel-tip-why">Why it matters: Attackers often use psychological pressure to make victims act without verifying the request.</p></span></span></span>
-            <span class="nlp-coercion-value" id="nlp-coercion-val">0.0</span>
-            <span class="table-badge" id="nlp-coercion-level">LOW</span>
-          </div>
-          <div class="nlp-sim-bars" id="nlp-sim-bars">
-            <div class="prob-row"><span class="prob-name" style="width:110px;">CEO Fraud</span><div class="prob-track"><div class="prob-fill bec-fill" id="sim-ceo" style="width:0%"></div></div><span class="prob-pct" id="sim-ceo-pct">0.00</span></div>
-            <div class="prob-row"><span class="prob-name" style="width:110px;">Invoice Alteration</span><div class="prob-track"><div class="prob-fill phishing-fill" id="sim-invoice" style="width:0%"></div></div><span class="prob-pct" id="sim-invoice-pct">0.00</span></div>
-            <div class="prob-row"><span class="prob-name" style="width:110px;">Credential Phish</span><div class="prob-track"><div class="prob-fill phishing-fill" id="sim-cred" style="width:0%"></div></div><span class="prob-pct" id="sim-cred-pct">0.00</span></div>
-            <div class="prob-row"><span class="prob-name" style="width:110px;">Benign Collab</span><div class="prob-track"><div class="prob-fill benign-fill" id="sim-benign" style="width:0%"></div></div><span class="prob-pct" id="sim-benign-pct">0.00</span></div>
-          </div>
-        </div>
-        <div class="ml-disclaimer">Contextual semantic cosine alignment against curated threat archetypes; evaluates coercive urgency, isolation, and authority pretexting velocity.</div>
-      </section>
-
-      <!-- Third Row: URL Intelligence (Paper 3 AR-LRF Feature Set) -->
-      <section class="card">
-        <div class="card-header">
-          <h3 class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="2" y1="12" x2="22" y2="12"/>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-            </svg>
-            URL & Domain Intelligence Radar (Paper 3: AR-LRF Features)
-          </h3>
-          <span class="card-meta-tag" id="url-count-tag">0 URLs Extracted</span>
-        </div>
-
-        <div id="url-table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Extracted URL</th>
-                <th>Domain / Host</th>
-                <th>Entropy ($H$)<span class="citadel-tip tip-below" data-tip="shannon-entropy"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Shannon Entropy</span><p>A mathematical measure of randomness in a URL string. Legitimate URLs tend to be readable; phishing URLs often use randomised characters that produce high entropy.</p><p class="citadel-tip-why">Why it matters: High-entropy URLs (e.g. <code>a8f3x9q2.xyz/k1m</code>) are a strong indicator of machine-generated phishing infrastructure.</p></span></span></th>
-                <th>Structural Anomaly Flags</th>
-                <th>Risk Score</th>
-                <th>Verdict</th>
-              </tr>
-            </thead>
-            <tbody id="url-table-body">
-              <!-- URLs injected dynamically -->
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Domain Intelligence / Enrichment Card (Phase 3) -->
-      <section class="card" id="enrichment-card">
-        <div class="card-header">
-          <h3 class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-            Domain Intelligence, GeoIP &amp; ASN Enrichment
-            <span class="citadel-tip tip-below" data-tip="ioc-threat-intel"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">IOC / Threat Intelligence</span><p><strong>IOC</strong> (Indicator of Compromise) is any domain, IP address, or sender address linked to known attacks. <strong>Threat Intelligence</strong> cross-references these IOCs against curated feeds of known adversary infrastructure.</p><p class="citadel-tip-why">Why it matters: Matching a single IOC can immediately confirm an email is part of a known attack campaign.</p><p class="citadel-tip-limitation">⚠️ Limitation: Citadel currently uses a curated offline IOC feed for demonstration — not a live commercial threat intelligence API.</p></span></span>
-            <span class="citadel-tip tip-below" data-tip="geoip"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">GeoIP (Geographic Mapping)</span><p>Associates an IP address with approximate geographic information to help identify routing origins.</p><p class="citadel-tip-why">Why it matters: Helps detect anomalies when email delivery infrastructure originates from regions inconsistent with the alleged sender organization.</p><p class="citadel-tip-limitation">⚠️ Demonstration Dataset: Citadel currently uses an offline demonstration dataset providing approximate geographic information rather than live city or coordinate geolocation services.</p></span></span>
-            <span class="citadel-tip tip-below" data-tip="asn"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">ASN (Autonomous System Number)</span><p>A globally unique number identifying a network operator or hosting provider (e.g. AWS, Microsoft Azure, Cloudflare, or consumer ISPs).</p><p class="citadel-tip-why">Why it matters: Reveals whether an email originated from legitimate enterprise mail networks, public cloud VPS, or bulletproof hosting providers.</p><p class="citadel-tip-limitation">⚠️ Limitation: Mapped from static demonstration datasets in this prototype.</p></span></span>
-          </h3>
-          <span class="card-meta-tag" id="enrichment-count-tag">0 Domains Analyzed</span>
-        </div>
-        <div id="enrichment-content">
-          <div class="empty-url-notice">No domain enrichment data yet. Analyze an email to see results.</div>
-        </div>
-      </section>
-
-      <!-- Cryptographic Evidence Integrity & Chain-of-Custody Ledger (Phase 9) -->
-      <section class="card" id="integrity-card">
-        <div class="card-header">
-          <h3 class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-            Cryptographic Evidence Integrity &amp; Merkle Evidence Ledger (Phase 9)<span class="citadel-tip tip-below" data-tip="merkle-ledger"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Merkle Evidence Ledger</span><p>An append-only chain of cryptographic blocks where each entry stores the SHA-256 hash of the evidence and links to the previous block.</p><p class="citadel-tip-why">Why it matters: Cryptographic hash links make unauthorized changes to the evidence or detection verdict detectable.</p><p class="citadel-tip-limitation">⚠️ Implementation Note: The current implementation is a local in-memory tamper-evident ledger for prototype verification, not a distributed blockchain.</p></span></span>
-          </h3>
-          <div class="integrity-header-controls">
-            <span class="integrity-badge badge-verified" id="integrity-status-badge">INTEGRITY: VERIFIED</span>
-            <button class="btn-sample" id="btn-verify-integrity">🛡️ Verify Integrity</button>
-            <button class="btn-sample btn-tamper" id="btn-simulate-tamper" title="Simulate evidence modification to demonstrate tamper detection">⚡ Test Tamper</button>
-          </div>
-        </div>
-
-        <div class="integrity-grid">
-          <!-- Evidence SHA-256 Box -->
-          <div class="integrity-metric-card">
-            <div class="integrity-card-label">Original Evidence SHA-256 (Raw RFC 5322 Bytes)<span class="citadel-tip" data-tip="sha256"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">SHA-256</span><p>A cryptographic fingerprint that produces a unique 64-character code from any data. Even a single-byte change in the original email will produce a completely different fingerprint.</p><p class="citadel-tip-why">Why it matters: Creates a cryptographic fingerprint of the raw RFC 5322 email bytes, allowing changes to the email bytes to be detected.</p></span></span></div>
-            <div class="integrity-hash-box">
-              <code id="integrity-evidence-sha256">—</code>
-            </div>
-            <div class="integrity-subtext">Hashed from exact uploaded bytes prior to parsing; creates a unique fingerprint to detect changes.</div>
-          </div>
-
-          <!-- Verdict & Headers SHA-256 Box -->
-          <div class="integrity-metric-card">
-            <div class="integrity-card-label">Verdict &amp; Header Digest (Canonical SHA-256)</div>
-            <div class="integrity-hash-box">
-              <code id="integrity-verdict-sha256">—</code>
-            </div>
-            <div class="integrity-subtext">Canonical digest binding detected score, risk level, archetype, and routing headers.</div>
-          </div>
-
-          <!-- Blockchain Ledger Block Anchor Box -->
-          <div class="integrity-metric-card">
-            <div class="integrity-card-label">Append-Only Cryptographic Ledger Anchor</div>
-            <div class="ledger-anchor-info">
-              <div><strong>Ledger Block:</strong> <span id="ledger-block-idx">#0</span></div>
-              <div><strong>Merkle Root:</strong> <code id="ledger-merkle-root">—</code></div>
-              <div><strong>Block Hash:</strong> <code id="ledger-block-hash">—</code></div>
-              <div><strong>Previous Block:</strong> <code id="ledger-prev-hash">—</code></div>
-              <div><strong>Chain Timestamp:</strong> <span id="ledger-timestamp">—</span></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Verification Checklist Banner -->
-        <div id="integrity-verification-banner" class="integrity-banner-verified">
-          <div class="integrity-banner-title">
-            <span id="verification-icon">✓</span>
-            <span id="verification-headline">Cryptographic Chain of Custody Confirmed</span>
-          </div>
-          <div class="integrity-checks-row" id="verification-checks-row">
-            <span class="check-pill check-pass" id="chk-evidence">Evidence Hash: Match</span>
-            <span class="check-pill check-pass" id="chk-verdict">Verdict Digest: Match</span>
-            <span class="check-pill check-pass" id="chk-merkle">Merkle Tree Root: Valid</span>
-            <span class="check-pill check-pass" id="chk-ledger">Ledger Chain Linkage: Intact</span>
-          </div>
-          <div class="integrity-banner-detail" id="verification-detail">
-            Original RFC 5322 message bytes and detection verdict match the append-only cryptographic evidence ledger without tampering.
-          </div>
-        </div>
-      </section>
-
-      <!-- Interactive SOC Threat Correlation Graph (Phase 5) -->
-      <section class="card" id="threat-graph-card">
-        <div class="card-header">
-          <h3 class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="18" cy="5" r="3"/>
-              <circle cx="6" cy="12" r="3"/>
-              <circle cx="18" cy="19" r="3"/>
-              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-            </svg>
-            Interactive SOC Threat Correlation Graph (Phase 5)<span class="citadel-tip tip-below" data-tip="threat-graph"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Threat Correlation Graph</span><p>A visual network map that connects all entities extracted from the email — sender, domains, URLs, IP addresses, ASN infrastructure, and known threat actors — into an interactive force-directed graph.</p><p class="citadel-tip-why">Why it matters: Seeing relationships between entities helps SOC analysts quickly understand an attacker's infrastructure and trace the full kill chain.</p></span></span>
-          </h3>
-          <div class="graph-header-controls">
-            <span class="card-meta-tag" id="graph-nodes-count">0 Entities Correlated</span>
-            <button class="btn-sample" id="graph-reset-btn" style="padding:4px 10px; font-size:0.75rem;">⟲ Reset Physics</button>
-          </div>
-        </div>
-        <div class="graph-legend">
-          <span class="legend-item"><span class="legend-dot" style="background:#38bdf8"></span>Email Case</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#a855f7"></span>Sender Identity</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span>Domain</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span>Extracted URL</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>Resolved IP</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#10b981"></span>Routing ASN</span>
-          <span class="legend-item"><span class="legend-dot" style="background:#dc2626"></span>Threat Actor</span>
-        </div>
-        <div class="threat-graph-wrapper">
-          <canvas id="threat-graph-canvas" width="1120" height="400"></canvas>
-          <div id="graph-node-inspector" class="graph-inspector-panel">
-            <div class="inspector-header">
-              <span id="inspector-title">Entity Dossier</span>
-              <button id="inspector-close" class="inspector-close-btn">&times;</button>
-            </div>
-            <div id="inspector-body" class="inspector-body">Click on any graph node to inspect live entity metadata.</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Fourth Row: Reasons & Recommended SOC Actions -->
-      <div class="two-col-row">
-        <!-- Detection Reasoning & Factor Breakdown -->
-        <section class="card">
-          <div class="card-header">
-            <h3 class="card-title">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-              </svg>
-              Detection Reasoning & Risk Factors
-            </h3>
-          </div>
-          <div class="reasons-list" id="reasons-list">
-            <!-- Reasons injected dynamically -->
-          </div>
-        </section>
-
-        <!-- Recommended SOC Playbook Actions -->
-        <section class="card">
-          <div class="card-header">
-            <h3 class="card-title">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="16" y1="13" x2="8" y2="13"/>
-                <line x1="16" y1="17" x2="8" y2="17"/>
-                <polyline points="10 9 9 9 8 9"/>
-              </svg>
-              Actionable SOC Response Playbook
-            </h3>
-          </div>
-          <ul class="action-checklist" id="actions-list">
-            <!-- Actions injected dynamically -->
-          </ul>
-        </section>
-      </div>
-
-      <!-- Fifth Row: Email Body Preview -->
-      <section class="card">
-        <div class="card-header">
-          <h3 class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-            </svg>
-            Normalized Message Body Inspection
-          </h3>
-        </div>
-        <div class="body-preview" id="email-body-preview">
-          (No content)
-        </div>
-      </section>
-
-    </div>
   </main>
 
   <footer class="app-footer">
-    <span>Citadel Email Security Platform v1.0.0-mvp</span>
+    <span>Citadel Email Security Platform</span>
     <span>Based on Research by Ahmed et al., Almutairi et al., Chaudhuri et al., and Uddin et al.</span>
   </footer>
 
-  <script src="/static/app.js?v=2"></script>
+  <script src="/static/app.js?v=apple_nav_v2"></script>
 </body>
 </html>

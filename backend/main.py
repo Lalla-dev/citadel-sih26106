@@ -59,6 +59,13 @@ SAMPLE_DESCRIPTIONS = {
     }
 }
 
+from backend.database import init_db, get_active_backend
+
+@app.on_event("startup")
+def on_startup():
+    """Initializes persistent database layer (PostgreSQL or SQLite fallback)."""
+    init_db()
+
 @app.get("/api/health")
 def health_check():
     ml_status = "unavailable"
@@ -68,7 +75,19 @@ def health_check():
         ml_status = "active" if clf.is_trained else "not_trained"
     except Exception:
         pass
-    return {"status": "operational", "system": "Citadel Phase 2 MVP", "ml_engine": ml_status}
+
+    db_backend = "unknown"
+    try:
+        db_backend = get_active_backend()
+    except Exception:
+        pass
+
+    return {
+        "status": "operational",
+        "system": "Citadel Phase 2 MVP",
+        "ml_engine": ml_status,
+        "database_backend": db_backend
+    }
 
 @app.get("/api/ml/status")
 def ml_model_status():

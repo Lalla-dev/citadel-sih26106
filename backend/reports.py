@@ -31,8 +31,24 @@ def store_case_result(result: AnalysisResult) -> None:
 
 
 def get_case_result(case_id: str) -> Optional[AnalysisResult]:
-    """Retrieves an AnalysisResult by case_id."""
-    return _CASE_RESULTS_STORE.get(case_id)
+    """
+    Retrieves an AnalysisResult by case_id.
+    Checks memory cache first, then rehydrates from persistent relational database
+    so forensic reports work seamlessly across application restarts.
+    """
+    if case_id in _CASE_RESULTS_STORE:
+        return _CASE_RESULTS_STORE[case_id]
+
+    try:
+        from backend.cases import get_case_repository
+        ticket = get_case_repository().get_case(case_id)
+        if ticket and ticket.analysis_result:
+            _CASE_RESULTS_STORE[case_id] = ticket.analysis_result
+            return ticket.analysis_result
+    except Exception:
+        pass
+
+    return None
 
 
 def generate_executive_summary(result: AnalysisResult) -> str:
