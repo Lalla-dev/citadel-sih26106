@@ -53,9 +53,14 @@ SAMPLE_DESCRIPTIONS = {
         "description": "Synthesized executive display-name spoofing scenario testing Reply-To diversion and acquisition wire pretexting."
     },
     "bec_invoice_bank_change.eml": {
-        "title": "Bogus Vendor Invoice",
+        "title": "Invoice Payment Alteration (BEC)",
         "category": "Synthetic Benchmark (BEC)",
-        "description": "Synthesized vendor banking details modification scenario testing remittance and routing cues."
+        "description": "Synthesized vendor banking detail modification testing urgent ACH payment redirection detection."
+    },
+    "ambiguous_vendor_security_notice.eml": {
+        "title": "External Vendor Advisory",
+        "category": "Synthetic Benchmark (Guarded / Ambiguous)",
+        "description": "Controlled synthetic vendor advisory testing risk arbitration and signal conflict moderation."
     }
 }
 

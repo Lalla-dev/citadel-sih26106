@@ -114,10 +114,16 @@ class MLClassification(BaseModel):
     predicted_label: str = "unknown"
     probabilities: Dict[str, float] = Field(default_factory=dict)
     ml_confidence: float = 0.0
-    model_type: str = "TF-IDF + Logistic Regression"
+    model_type: str = "AI/ML Multi-Model Soft-Voting Ensemble (Logistic Regression, Random Forest, XGBoost)"
+    ensemble_prediction: str = ""
+    ensemble_confidence: float = 0.0
+    agreement_level: str = "HIGH"  # HIGH, MODERATE, LOW
+    agreement_detail: str = ""
+    models: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+    ensemble_weights: Dict[str, float] = Field(default_factory=dict)
     model_disclaimer: str = (
-        "Trained on synthetic benchmark corpus. Probabilities complement the heuristic engine and "
-        "do NOT represent standalone production accuracy."
+        "Multi-model ensemble (LR + RF + XGBoost) trained on controlled synthetic benchmark data. "
+        "Probabilities are arbitrated with cryptographic email headers and security evidence."
     )
 
 class ContextualNLPAnalysis(BaseModel):
@@ -128,6 +134,15 @@ class ContextualNLPAnalysis(BaseModel):
     coercion_level: str = "LOW"
     coercion_breakdown: Dict[str, List[str]] = Field(default_factory=dict)
     tone: str = "NEUTRAL"
+
+class RiskArbitration(BaseModel):
+    arbitration_status: str = "CONVERGENT"  # CONVERGENT, SIGNAL_CONFLICT, ELEVATED_EVIDENCE, HEURISTIC_DOMINANT
+    calibrated_score: int = 0
+    calibrated_risk: str = "LOW"  # LOW, GUARDED, MEDIUM, HIGH, CRITICAL
+    arbitration_summary: str = ""
+    conflict_detected: bool = False
+    conflict_reason: Optional[str] = None
+    signal_breakdown: Dict[str, Any] = Field(default_factory=dict)
 
 class EvidenceIntegrity(BaseModel):
     evidence_sha256: str = ""
@@ -159,7 +174,7 @@ class AnalysisResult(BaseModel):
         "Calibrated across independent security signals: MIME headers, lexical URLs, ML classifier, "
         "contextual NLP pretexting, and threat intelligence feeds. Does not represent standalone model accuracy."
     )
-    risk_level: str = "LOW"  # LOW, MEDIUM, HIGH, CRITICAL
+    risk_level: str = "LOW"  # LOW, GUARDED, MEDIUM, HIGH, CRITICAL
     threat_archetype: str = "Clean Email"
     reasons: List[DetectionReason] = Field(default_factory=list)
     recommended_actions: List[str] = Field(default_factory=list)
@@ -167,3 +182,4 @@ class AnalysisResult(BaseModel):
     enrichment: Optional[Dict[str, Any]] = None
     threat_graph: Optional[Dict[str, Any]] = None
     integrity: Optional[EvidenceIntegrity] = None
+    risk_arbitration: Optional[RiskArbitration] = None

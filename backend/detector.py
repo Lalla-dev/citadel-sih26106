@@ -351,6 +351,267 @@ class CitadelDetectorOrchestrator:
                 self._ml_classifier = None
         return self._ml_classifier
 
+    def _arbitrate_risk(
+        self,
+        heuristic_score: int,
+        heuristic_conf: float,
+        auth: Any,
+        urls: List[Any],
+        intent: Any,
+        ml_result: Any,
+        nlp_result: Any,
+        enrichment: Dict[str, Any],
+        reasons: List[DetectionReason]
+    ) -> Tuple[int, str, float, Any]:
+        """
+        Calibrated Multi-Source Risk Arbitration Layer.
+        Arbitrates across:
+          - Cryptographic Authentication (SPF, DKIM, DMARC)
+          - Identity Integrity (Display name spoofing, Reply-To diversion, Return-Path mismatch)
+          - Network & URL Indicators (Hex encoding, raw IP, Shannon entropy)
+          - Behavioral Pretexting (Financial wire, urgency, authority, coercion index)
+          - AI/ML Multi-Model Ensemble (LR, RF, XGBoost consensus & probabilities)
+          - External Threat Intelligence & Infrastructure GeoIP
+
+        Calibrated Risk Tiers:
+          CRITICAL: 85 - 100
+          HIGH:     70 - 84
+          MEDIUM:   50 - 69
+          GUARDED:  30 - 49
+          LOW:      0  - 29
+        """
+        from backend.schemas import RiskArbitration
+
+        has_dmarc_fail = auth.dmarc.status == "fail"
+        has_spf_fail = auth.spf.status in ("fail", "softfail")
+        has_spoof = auth.display_name_spoofed
+        has_reply_mismatch = auth.reply_to_mismatch
+
+        malicious_urls = [u for u in urls if u.risk_category == "MALICIOUS"]
+        suspicious_urls = [u for u in urls if u.risk_category == "SUSPICIOUS"]
+
+        has_financial_wire = intent.financial_wire_detected
+        has_urgency = intent.urgency_detected
+        has_authority = intent.authority_pretext_detected
+        has_ti_match = bool(enrichment.get("threat_intel", {}).get("matched"))
+
+        ml_threat = ml_result.ml_available and ml_result.predicted_label in ("phishing", "bec") and ml_result.ml_confidence >= 0.55
+        ml_benign = ml_result.ml_available and ml_result.predicted_label == "benign" and ml_result.ml_confidence >= 0.65
+
+        auth_clean = (
+            auth.spf.status == "pass" and
+            auth.dkim.status == "pass" and
+            auth.dmarc.status == "pass" and
+            not has_spoof and
+            not has_reply_mismatch
+        )
+        urls_clean = (len(malicious_urls) == 0 and len(suspicious_urls) == 0)
+
+        severe_indicators = []
+        if has_spoof:
+            severe_indicators.append("Executive/VIP Display Spoofing")
+        if has_reply_mismatch:
+            severe_indicators.append("Reply-To Diversion / Hijack")
+        if has_financial_wire and has_urgency:
+            severe_indicators.append("Coercive Financial Wire / Banking Demand")
+        if has_dmarc_fail:
+            severe_indicators.append("DMARC Policy Rejection")
+        if malicious_urls:
+            severe_indicators.append("Malicious URL / Raw IP Host")
+        if has_ti_match:
+            severe_indicators.append("Threat Intelligence IOC Attribution")
+
+        severe_count = len(severe_indicators)
+
+        # PATHWAY 1: Clear Benign Routine Communication
+        if heuristic_score <= 25 and not ml_threat and not has_dmarc_fail and not malicious_urls and not has_spoof and not has_financial_wire:
+            calibrated_score = min(20, max(0, heuristic_score))
+            calibrated_risk = "LOW"
+            confidence = 0.95 if auth_clean else 0.88
+            arbitration = RiskArbitration(
+                arbitration_status="CONVERGENT",
+                calibrated_score=calibrated_score,
+                calibrated_risk=calibrated_risk,
+                conflict_detected=False,
+                arbitration_summary="Multi-signal convergence: verified clean authentication, benign text, and zero malicious indicators.",
+                signal_breakdown={"auth": "PASS", "urls": "CLEAN", "ml": ml_result.predicted_label, "severe_count": 0}
+            )
+            return calibrated_score, calibrated_risk, confidence, arbitration
+
+        # PATHWAY 2: Signal Conflict — ML Flagged Threat vs. Valid Cryptographic Auth & Clean Infrastructure
+        # (Restrains scores so ambiguous business or security notices don't peg at CRITICAL)
+        if ml_threat and auth_clean and urls_clean and not has_financial_wire and not has_spoof:
+            has_contextual_indicators = (heuristic_score >= 10 or has_urgency or intent.overall_intent_score >= 15 or (nlp_result and nlp_result.coercion_level != "LOW"))
+
+            if not has_contextual_indicators and heuristic_score <= 5:
+                # ML isolated cue on completely routine text with zero suspicious cues
+                calibrated_score = min(15, max(0, int(ml_result.ml_confidence * 12)))
+                calibrated_risk = "LOW"
+                confidence = 0.90
+                arbitration = RiskArbitration(
+                    arbitration_status="SIGNAL_CONFLICT",
+                    calibrated_score=calibrated_score,
+                    calibrated_risk=calibrated_risk,
+                    conflict_detected=True,
+                    conflict_reason="ML ensemble flagged routine vocabulary, but zero heuristic, intent, or header anomalies exist.",
+                    arbitration_summary="Score kept in LOW: ML prediction has zero corroboration from headers, heuristics, or URLs.",
+                    signal_breakdown={
+                        "auth": "CRYPTO_PASS",
+                        "urls": "CLEAN",
+                        "ml": f"{ml_result.predicted_label} ({ml_result.ml_confidence:.2f})",
+                        "severe_count": 0
+                    }
+                )
+                return calibrated_score, calibrated_risk, confidence, arbitration
+            else:
+                conflict_reason = (
+                    f"ML ensemble predicted '{ml_result.predicted_label}' (conf: {ml_result.ml_confidence:.2f}), "
+                    f"but message passed cryptographic SPF/DKIM/DMARC authentication with uncompromised identity and clean URLs."
+                )
+                calibrated_score = min(45, max(30, int(heuristic_score * 0.4 + ml_result.ml_confidence * 20)))
+                calibrated_risk = "GUARDED"
+                confidence = 0.65
+
+                reasons.append(DetectionReason(
+                    category="Risk Arbitration",
+                    description=f"Signal conflict arbitrated: {conflict_reason} Risk moderated to GUARDED pending SOC review.",
+                    weight=0.0,
+                    severity="INFO"
+                ))
+
+                arbitration = RiskArbitration(
+                    arbitration_status="SIGNAL_CONFLICT",
+                    calibrated_score=calibrated_score,
+                    calibrated_risk=calibrated_risk,
+                    conflict_detected=True,
+                    conflict_reason=conflict_reason,
+                    arbitration_summary="Score moderated to GUARDED: ML threat prediction restrained by valid cryptographic authentication.",
+                    signal_breakdown={
+                        "auth": "CRYPTO_PASS",
+                        "urls": "CLEAN",
+                        "intent": "NON_FINANCIAL",
+                        "ml": f"{ml_result.predicted_label} ({ml_result.ml_confidence:.2f})",
+                        "severe_count": 0
+                    }
+                )
+                return calibrated_score, calibrated_risk, confidence, arbitration
+
+        # PATHWAY 3: Signal Conflict — ML Benign vs. Objective Security Violations
+        if ml_benign and (has_dmarc_fail or malicious_urls or has_spoof):
+            conflict_reason = (
+                f"ML ensemble predicted benign text (conf: {ml_result.ml_confidence:.2f}), "
+                f"but objective security violations were detected: {', '.join(severe_indicators)}."
+            )
+            calibrated_score = max(heuristic_score, 72 if (has_dmarc_fail and malicious_urls) else 58)
+            calibrated_risk = "HIGH" if calibrated_score >= 70 else "MEDIUM"
+            confidence = 0.72
+
+            reasons.append(DetectionReason(
+                category="Risk Arbitration",
+                description=f"Security evidence overrides benign ML: {conflict_reason}",
+                weight=0.0,
+                severity="HIGH"
+            ))
+
+            arbitration = RiskArbitration(
+                arbitration_status="ELEVATED_EVIDENCE",
+                calibrated_score=calibrated_score,
+                calibrated_risk=calibrated_risk,
+                conflict_detected=True,
+                conflict_reason=conflict_reason,
+                arbitration_summary="Risk elevated: Objective cryptographic/URL security violations override benign ML text classification.",
+                signal_breakdown={
+                    "auth": "FAIL" if has_dmarc_fail else "INCONCLUSIVE",
+                    "urls": "MALICIOUS" if malicious_urls else "CLEAN",
+                    "ml": f"benign ({ml_result.ml_confidence:.2f})",
+                    "severe_count": severe_count
+                }
+            )
+            return calibrated_score, calibrated_risk, confidence, arbitration
+
+        # PATHWAY 4: Multi-Vector Corroboration (High / Critical Threats)
+        if severe_count >= 3 or (has_spoof and has_reply_mismatch and has_financial_wire) or (has_dmarc_fail and malicious_urls):
+            # Unanimous multi-vector active threat
+            calibrated_score = min(96, max(88, 85 + (severe_count * 2) + int(ml_result.ml_confidence * 5)))
+            calibrated_risk = "CRITICAL"
+            confidence = min(0.98, 0.88 + (severe_count * 0.02))
+            arbitration = RiskArbitration(
+                arbitration_status="CONVERGENT",
+                calibrated_score=calibrated_score,
+                calibrated_risk=calibrated_risk,
+                conflict_detected=False,
+                arbitration_summary=f"Critical multi-vector threat confirmed: {severe_count} attack vectors corroborate ({', '.join(severe_indicators[:3])}).",
+                signal_breakdown={
+                    "auth": "SPOOFED_OR_FAILED",
+                    "severe_count": severe_count,
+                    "ml": f"{ml_result.predicted_label} ({ml_result.ml_confidence:.2f})",
+                    "severe_indicators": severe_indicators
+                }
+            )
+            return calibrated_score, calibrated_risk, confidence, arbitration
+
+        elif severe_count >= 2 or (has_reply_mismatch and has_financial_wire) or (has_spf_fail and has_financial_wire):
+            # Serious targeted attack
+            calibrated_score = min(84, max(72, int(heuristic_score * 0.7 + ml_result.ml_confidence * 16)))
+            calibrated_risk = "HIGH"
+            confidence = 0.85
+            arbitration = RiskArbitration(
+                arbitration_status="CONVERGENT",
+                calibrated_score=calibrated_score,
+                calibrated_risk=calibrated_risk,
+                conflict_detected=False,
+                arbitration_summary=f"High risk corroborated: {severe_count} attack indicators present ({', '.join(severe_indicators[:2])}).",
+                signal_breakdown={
+                    "severe_count": severe_count,
+                    "ml": f"{ml_result.predicted_label} ({ml_result.ml_confidence:.2f})",
+                    "severe_indicators": severe_indicators
+                }
+            )
+            return calibrated_score, calibrated_risk, confidence, arbitration
+
+        elif severe_count == 1 or suspicious_urls or has_spf_fail or (has_urgency and not auth_clean):
+            # Moderate risk
+            calibrated_score = min(68, max(50, int(heuristic_score * 0.8 + (10 if ml_threat else 0))))
+            calibrated_risk = "MEDIUM"
+            confidence = 0.70
+            arbitration = RiskArbitration(
+                arbitration_status="HEURISTIC_DOMINANT",
+                calibrated_score=calibrated_score,
+                calibrated_risk=calibrated_risk,
+                conflict_detected=False,
+                arbitration_summary="Medium risk: single or partial threat indicator present without multi-vector corroboration.",
+                signal_breakdown={"severe_count": severe_count, "ml": ml_result.predicted_label}
+            )
+            return calibrated_score, calibrated_risk, confidence, arbitration
+
+        elif heuristic_score >= 30:
+            calibrated_score = min(48, max(30, heuristic_score))
+            calibrated_risk = "GUARDED"
+            confidence = 0.65
+            arbitration = RiskArbitration(
+                arbitration_status="HEURISTIC_DOMINANT",
+                calibrated_score=calibrated_score,
+                calibrated_risk=calibrated_risk,
+                conflict_detected=False,
+                arbitration_summary="Guarded risk: minor anomalies present, exercise vigilance.",
+                signal_breakdown={"severe_count": 0, "heuristic": heuristic_score}
+            )
+            return calibrated_score, calibrated_risk, confidence, arbitration
+
+        else:
+            calibrated_score = min(29, max(0, heuristic_score))
+            calibrated_risk = "LOW"
+            confidence = 0.90
+            arbitration = RiskArbitration(
+                arbitration_status="CONVERGENT",
+                calibrated_score=calibrated_score,
+                calibrated_risk=calibrated_risk,
+                conflict_detected=False,
+                arbitration_summary="Low risk: standard email meeting baseline security criteria.",
+                signal_breakdown={"severe_count": 0, "heuristic": heuristic_score}
+            )
+            return calibrated_score, calibrated_risk, confidence, arbitration
+
     def analyze(self, parsed_email: ParsedEmail, filename: str = "unnamed.eml", raw_bytes: Optional[bytes] = None) -> AnalysisResult:
         from backend.headers import analyze_headers
         from backend.url_analyzer import analyze_urls
@@ -368,7 +629,7 @@ class CitadelDetectorOrchestrator:
             parsed_email, auth_analysis, url_analyses
         )
 
-        # 4. ML Classification (Phase 2 — additive signal)
+        # 4. ML Classification (Phase 2 & Phase 11 — Multi-Model AI/ML Ensemble: LR, RF, XGBoost)
         ml_result = MLClassification()
         ml_classifier = self._get_ml_classifier()
         ml_boost = 0
@@ -379,32 +640,37 @@ class CitadelDetectorOrchestrator:
                 ml_available=ml_pred.get("ml_available", False),
                 predicted_label=ml_pred.get("predicted_label", "unknown"),
                 probabilities=ml_pred.get("probabilities", {}),
-                ml_confidence=ml_pred.get("ml_confidence", 0.0)
+                ml_confidence=ml_pred.get("ml_confidence", 0.0),
+                model_type="AI/ML Multi-Model Soft-Voting Ensemble (Logistic Regression, Random Forest, XGBoost)",
+                ensemble_prediction=ml_pred.get("ensemble_prediction", ""),
+                ensemble_confidence=ml_pred.get("ensemble_confidence", 0.0),
+                agreement_level=ml_pred.get("agreement_level", "HIGH"),
+                agreement_detail=ml_pred.get("agreement_detail", ""),
+                models=ml_pred.get("models", {}),
+                ensemble_weights=ml_pred.get("ensemble_weights", {})
             )
 
-            # ML boosts the heuristic score when both agree on a threat
+            # ML contributes evidence signal to reasons
             if ml_result.ml_available:
                 phish_prob = ml_result.probabilities.get("phishing", 0.0)
                 bec_prob = ml_result.probabilities.get("bec", 0.0)
                 threat_prob = phish_prob + bec_prob
 
-                if ml_result.predicted_label in ("phishing", "bec") and ml_result.ml_confidence >= 0.6:
-                    # ML confirms threat — add boost proportional to ML confidence
+                if ml_result.predicted_label in ("phishing", "bec") and ml_result.ml_confidence >= 0.55:
                     ml_boost = int(threat_prob * 15)
                     reasons.append(DetectionReason(
                         category="ML Classification",
-                        description=f"TF-IDF + LR classifier predicts '{ml_result.predicted_label}' "
-                                    f"(p={ml_result.ml_confidence:.2f}). "
+                        description=f"AI/ML Ensemble ({ml_result.agreement_level} agreement) predicts '{ml_result.predicted_label}' "
+                                    f"(p={ml_result.ml_confidence:.2f}). {ml_result.agreement_detail} "
                                     f"Probabilities: phishing={phish_prob:.2f}, bec={bec_prob:.2f}.",
                         weight=float(ml_boost),
                         severity="HIGH" if ml_result.ml_confidence >= 0.8 else "MEDIUM"
                     ))
-                elif ml_result.predicted_label == "benign" and ml_result.ml_confidence >= 0.7 and heuristic_score >= 30:
-                    # ML disagrees with heuristic, signal ambiguity
+                elif ml_result.predicted_label == "benign" and ml_result.ml_confidence >= 0.65 and heuristic_score >= 30:
                     reasons.append(DetectionReason(
                         category="ML Classification",
-                        description=f"ML classifier predicts 'benign' (p={ml_result.ml_confidence:.2f}) "
-                                    f"while heuristic score is {heuristic_score}. Conflict suggests manual review.",
+                        description=f"AI/ML Ensemble predicts 'benign' (p={ml_result.ml_confidence:.2f}) "
+                                    f"while heuristic indicators exist. Signal divergence flagged for arbitration.",
                         weight=0.0,
                         severity="INFO"
                     ))
@@ -545,33 +811,18 @@ class CitadelDetectorOrchestrator:
         except Exception as e:
             enrichment_data["error"] = f"Enrichment unavailable: {str(e)}"
 
-        # 7. Final Score Aggregation (after all signal sources)
-        threat_score = min(100, max(0, heuristic_score + ml_boost))
-
-        # Recalculate risk level after all boosts
-        if threat_score >= 70:
-            risk_level = "CRITICAL"
-        elif threat_score >= 45:
-            risk_level = "HIGH"
-        elif threat_score >= 25:
-            risk_level = "MEDIUM"
-        else:
-            risk_level = "LOW"
-
-        # 8. Combined Confidence (heuristic + ML agreement factor)
-        evidence_count = len(reasons)
-        if ml_result.ml_available and ml_result.ml_confidence > 0:
-            ml_agrees = (
-                (ml_result.predicted_label in ("phishing", "bec") and heuristic_score >= 40) or
-                (ml_result.predicted_label == "benign" and heuristic_score < 25)
-            )
-            if ml_agrees:
-                confidence = min(0.98, heuristic_conf * 0.6 + ml_result.ml_confidence * 0.4)
-            else:
-                confidence = max(0.45, min(0.70, heuristic_conf * 0.7))
-        else:
-            confidence = heuristic_conf
-        confidence = round(confidence, 2)
+        # 7. Final Evidence & Risk Arbitration Layer (Multi-Source Convergence & Conflict Detection)
+        threat_score, risk_level, confidence, arbitration = self._arbitrate_risk(
+            heuristic_score=heuristic_score,
+            heuristic_conf=heuristic_conf,
+            auth=auth_analysis,
+            urls=url_analyses,
+            intent=intent,
+            ml_result=ml_result,
+            nlp_result=nlp_result,
+            enrichment=enrichment_data,
+            reasons=reasons
+        )
 
         metadata = EmailMetadata(
             subject=parsed_email.subject,
@@ -603,7 +854,8 @@ class CitadelDetectorOrchestrator:
             reasons=reasons,
             recommended_actions=actions,
             body_text_preview=body_preview,
-            enrichment=enrichment_data if enrichment_data else None
+            enrichment=enrichment_data if enrichment_data else None,
+            risk_arbitration=arbitration
         )
 
         # 9. Threat Correlation & Entity Graph (Phase 5)

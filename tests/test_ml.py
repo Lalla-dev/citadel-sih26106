@@ -60,6 +60,38 @@ class TestMLClassifier(unittest.TestCase):
         total = sum(probs.values())
         self.assertAlmostEqual(total, 1.0, places=2)
 
+    def test_ensemble_contains_three_models(self):
+        """Ensemble classifier must incorporate Logistic Regression, Random Forest, and XGBoost."""
+        self.assertIsNotNone(self.clf.lr_model, "Logistic Regression model should be initialized")
+        self.assertIsNotNone(self.clf.rf_model, "Random Forest model should be initialized")
+        self.assertIsNotNone(self.clf.xgb_model, "XGBoost model should be initialized")
+        result = self.clf.predict("Your password will expire in 2 hours. Click to verify.")
+        self.assertIn("models", result)
+        self.assertIn("logistic_regression", result["models"])
+        self.assertIn("random_forest", result["models"])
+        self.assertIn("xgboost", result["models"])
+
+    def test_ensemble_agreement_and_disagreement_exposed(self):
+        """Predictions must expose agreement level (HIGH/MODERATE/LOW) and detail."""
+        res_phish = self.clf.predict("URGENT: Your account has been compromised. Click here immediately.")
+        self.assertIn("agreement_level", res_phish)
+        self.assertIn(res_phish["agreement_level"], ["HIGH", "MODERATE", "LOW"])
+        self.assertIn("agreement_detail", res_phish)
+
+    def test_held_out_evaluation_metrics_computed(self):
+        """Training metrics must include held_out_evaluation for all 4 models."""
+        metrics = self.clf.training_metrics
+        self.assertIn("held_out_evaluation", metrics)
+        held_out = metrics["held_out_evaluation"]
+        self.assertIn("models", held_out)
+        self.assertIn("logistic_regression", held_out["models"])
+        self.assertIn("random_forest", held_out["models"])
+        self.assertIn("xgboost", held_out["models"])
+        self.assertIn("ensemble", held_out["models"])
+        ens_metrics = held_out["models"]["ensemble"]
+        self.assertGreater(ens_metrics["accuracy"], 0.70)
+        self.assertIn("confusion_matrix", ens_metrics)
+
 
 class TestMLPipelineIntegration(unittest.TestCase):
     """Tests that ML classification integrates into the detection pipeline."""

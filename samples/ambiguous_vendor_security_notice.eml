@@ -1,0 +1,28 @@
+From: "Apex Cloud Advisory" <advisory@apex-cloud-updates.com>
+To: "IT Infrastructure Team" <infrastructure@acme-corp.internal>
+Subject: Action Required: Review Upcoming API Deprecation and Security Update
+Date: Thu, 04 Sep 2026 11:20:00 +0000
+Message-ID: <advisory-2026-9018@apex-cloud-updates.com>
+Return-Path: <advisory@apex-cloud-updates.com>
+Reply-To: support@apex-cloud-updates.com
+Authentication-Results: mx.acme-corp.internal; spf=pass smtp.mailfrom=apex-cloud-updates.com; dkim=pass header.d=apex-cloud-updates.com; dmarc=pass
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+Dear Enterprise Customer,
+
+Action required: Please be advised that legacy REST API endpoints (v1.2) will expire within 30 days.
+
+Please ensure your systems comply before the migration deadline:
+1. Review the migration checklist for your active integrations.
+2. Update your OAuth token exchange endpoints to our current specification.
+3. Test compatibility in your sandbox environment immediately to prevent service disruptions.
+
+Official documentation and deprecation timetable:
+https://docs.apex-cloud-updates.com/v2/migration-guide
+
+If your engineering team requires extended migration assistance, please contact your technical account manager.
+
+Sincerely,
+Partner Architecture Team
+Apex Cloud Services

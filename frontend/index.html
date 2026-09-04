@@ -83,21 +83,67 @@
 
         <div class="sample-picker">
           <div class="picker-header">
-            <span class="picker-title">⚡ Research Test Scenarios (Synthetic Benchmark Data)</span>
-            <span class="picker-hint">Pre-configured test scenarios based on attack archetypes from reference research</span>
+            <span class="picker-title">⚡ Demo &amp; Research Scenarios
+              <span class="citadel-tip tip-below" data-tip="demo-scenarios-disclaimer">
+                <span class="citadel-tip-icon">ⓘ</span>
+                <span class="citadel-tip-body">
+                  <span class="citadel-tip-title">Demo &amp; Research Scenarios</span>
+                  <p>These are controlled synthetic email cases derived from common phishing and BEC attack patterns. They are provided for safe demonstrations and repeatable testing. They are not live emails and are not evidence from an actual incident.</p>
+                </span>
+              </span>
+            </span>
+            <span class="picker-hint">Pre-configured test scenarios based on threat archetypes and signal tension</span>
           </div>
           <div class="sample-buttons" id="sample-buttons-container">
             <button class="sample-btn" data-file="benign_project_update.eml">
               <span class="badge clean">BENIGN</span> Corporate Project Sync
+              <span class="citadel-tip tip-below" data-tip="scenario-benign">
+                <span class="citadel-tip-icon">ⓘ</span>
+                <span class="citadel-tip-body">
+                  <span class="citadel-tip-title">Corporate Project Sync</span>
+                  <p>Represents a standard legitimate business email: valid SPF/DKIM authentication, no coercive language, routine coordination intent, and zero malicious IOCs.</p>
+                </span>
+              </span>
             </button>
             <button class="sample-btn" data-file="credential_phishing_link.eml">
               <span class="badge phish">PHISHING</span> Credential Alert Link
+              <span class="citadel-tip tip-below" data-tip="scenario-phish">
+                <span class="citadel-tip-icon">ⓘ</span>
+                <span class="citadel-tip-body">
+                  <span class="citadel-tip-title">Credential Alert Link</span>
+                  <p>Represents credential harvesting: urgent security alert pretext, misleading call-to-action link, high-entropy destination domain, and failed SPF/DKIM authentication.</p>
+                </span>
+              </span>
             </button>
             <button class="sample-btn" data-file="bec_ceo_wire_fraud.eml">
               <span class="badge bec">BEC</span> CEO Wire Fraud Transfer
+              <span class="citadel-tip tip-below" data-tip="scenario-ceo-bec">
+                <span class="citadel-tip-icon">ⓘ</span>
+                <span class="citadel-tip-body">
+                  <span class="citadel-tip-title">CEO Wire Fraud Transfer</span>
+                  <p>Represents executive impersonation (BEC): authority pretext from the CEO, urgency and strict confidentiality pressure, wire transfer instructions, and an external Reply-To mismatch.</p>
+                </span>
+              </span>
             </button>
             <button class="sample-btn" data-file="bec_invoice_bank_change.eml">
               <span class="badge bec">BEC</span> Bogus Invoice Bank Change
+              <span class="citadel-tip tip-below" data-tip="scenario-invoice-bec">
+                <span class="citadel-tip-icon">ⓘ</span>
+                <span class="citadel-tip-body">
+                  <span class="citadel-tip-title">Bogus Invoice Bank Change</span>
+                  <p>Represents vendor invoice fraud (BEC): updated banking coordinates, overdue remittance pretext, financial keywords, and spoofed supplier identity.</p>
+                </span>
+              </span>
+            </button>
+            <button class="sample-btn" data-file="ambiguous_vendor_security_notice.eml">
+              <span class="badge guarded">GUARDED</span> Ambiguous Security Notice
+              <span class="citadel-tip tip-below" data-tip="scenario-ambiguous">
+                <span class="citadel-tip-icon">ⓘ</span>
+                <span class="citadel-tip-body">
+                  <span class="citadel-tip-title">Ambiguous Vendor Security Notice</span>
+                  <p>Represents signal tension / conflicting evidence: authentic domain and valid SPF/DKIM authentication, but elevated advisory urgency. Demonstrates calibrated risk arbitration preventing false CRITICAL saturation.</p>
+                </span>
+              </span>
             </button>
           </div>
         </div>
@@ -140,7 +186,8 @@
             </div>
             <div class="badge-cluster">
               <div class="risk-badge" id="risk-level-badge">LOW</div>
-              <div class="confidence-badge" id="confidence-badge"><span id="confidence-badge-text">Heuristic Confidence: 95%</span><span class="citadel-tip tip-left" data-tip="heuristic-confidence"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Heuristic Confidence</span><p>Measures how many independent detection rules agree on the verdict — not a statistical probability. Higher values mean more rule convergence.</p><p class="citadel-tip-why">Why it matters: Multi-indicator agreement reduces false positives and strengthens detection reliability.</p></span></span></div>
+              <div class="confidence-badge" id="confidence-badge"><span id="confidence-badge-text">Detection Confidence: 95%</span><span class="citadel-tip tip-left" data-tip="heuristic-confidence"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Detection Confidence</span><p>Measures multi-signal convergence across heuristic and ensemble ML detectors. Higher values indicate stronger cross-layer indicator agreement.</p><p class="citadel-tip-why">Why it matters: Multi-indicator agreement reduces false positives and strengthens detection reliability.</p></span></span></div>
+              <div class="confidence-badge" id="arbitration-badge" style="display: none;"><span id="arbitration-badge-text">Arbitration: Aligned</span><span class="citadel-tip tip-left" data-tip="risk-arbitration"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Evidence &amp; Risk Arbitration</span><p id="arbitration-tip-desc">Arbitrates ML ensemble predictions against SPF/DKIM/DMARC headers, URL IOCs, BEC intent, and NLP coercion to prevent false critical risk saturation.</p><p class="citadel-tip-why" id="arbitration-tip-rationale">Rationale: Multi-vector evidence agreement.</p></span></span></div>
             </div>
           </div>
         </div>
@@ -359,19 +406,19 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
                 </svg>
-                ML Text Classification
-                <span class="citadel-tip tip-below" data-tip="ml-classification"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">ML Classification (TF-IDF + Logistic Regression)</span><p><strong>TF-IDF</strong> converts email text into numerical importance scores for each word. <strong>Logistic Regression</strong> uses those scores to predict whether the email is benign, phishing, or a BEC attack.</p><p class="citadel-tip-why">Why it matters: Machine learning catches subtle textual patterns that handwritten rules might miss.</p><p class="citadel-tip-limitation">⚠️ Limitation: The current model is trained on a synthetic benchmark corpus, not a verified public dataset. Probabilities complement — but do not replace — the heuristic engine.</p></span></span>
+                AI / ML Threat Ensemble
+                <span class="citadel-tip tip-below" data-tip="ml-classification"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">AI / ML Multi-Model Ensemble</span><p>Combines three independent classifiers via soft-voting probability aggregation: <strong>Logistic Regression</strong> (linear boundary), <strong>Random Forest</strong> (bagged decision trees), and <strong>XGBoost</strong> (gradient boosted trees) over TF-IDF n-gram features.</p><p class="citadel-tip-why">Why it matters: Ensembling captures both linear word associations and non-linear feature interactions, providing resilient predictions and transparent consensus/disagreement signals.</p><p class="citadel-tip-limitation">⚠️ Controlled Evaluation: Models are trained and evaluated on controlled synthetic research corpora. Predictions are arbitrated against independent security evidence before reaching the final verdict.</p></span></span>
               </h3>
-              <span class="auth-notice-tag" id="ml-status-tag">ML Engine: Loading...</span>
+              <span class="auth-notice-tag" id="ml-status-tag">ML Ensemble: Loading...</span>
             </div>
 
             <div class="ml-grid">
               <div class="ml-prediction-box">
-                <span class="ml-label">Predicted Class</span>
+                <span class="ml-label">Ensemble Prediction</span>
                 <span class="ml-value" id="ml-predicted-label">—</span>
               </div>
               <div class="ml-prediction-box">
-                <span class="ml-label">Confidence</span>
+                <span class="ml-label">Ensemble Confidence</span>
                 <span class="ml-value" id="ml-confidence-val">—</span>
               </div>
               <div class="ml-prob-bars" id="ml-prob-bars">
@@ -380,7 +427,33 @@
                 <div class="prob-row"><span class="prob-name">BEC</span><div class="prob-track"><div class="prob-fill bec-fill" id="prob-bec" style="width:0%"></div></div><span class="prob-pct" id="prob-bec-pct">0%</span></div>
               </div>
             </div>
-            <div class="ml-disclaimer">Trained on synthetic benchmark corpus. Probabilities complement the heuristic engine and do NOT represent standalone production accuracy.</div>
+
+            <!-- Model Agreement Breakdown -->
+            <div class="ml-ensemble-section" id="ml-ensemble-section" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-hairline);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; color: var(--text-tertiary); text-transform: uppercase;">Model Agreement</span>
+                <span class="table-badge" id="ml-agreement-badge" style="font-size: 0.7rem; font-weight: 700;">Consensus: —</span>
+              </div>
+              <div class="model-votes-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                <div class="model-vote-item" style="background: var(--bg-subtle); padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-hairline);">
+                  <div style="font-size: 0.68rem; color: var(--text-tertiary); font-weight: 600;">Logistic Regression</div>
+                  <div id="vote-lr" style="font-size: 0.78rem; font-weight: 700; margin-top: 2px; color: var(--text-primary);">—</div>
+                </div>
+                <div class="model-vote-item" style="background: var(--bg-subtle); padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-hairline);">
+                  <div style="font-size: 0.68rem; color: var(--text-tertiary); font-weight: 600;">Random Forest</div>
+                  <div id="vote-rf" style="font-size: 0.78rem; font-weight: 700; margin-top: 2px; color: var(--text-primary);">—</div>
+                </div>
+                <div class="model-vote-item" style="background: var(--bg-subtle); padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-hairline);">
+                  <div style="font-size: 0.68rem; color: var(--text-tertiary); font-weight: 600;">XGBoost</div>
+                  <div id="vote-xgb" style="font-size: 0.78rem; font-weight: 700; margin-top: 2px; color: var(--text-primary);">—</div>
+                </div>
+              </div>
+              <div id="ml-disagreement-alert" style="display: none; margin-top: 10px; padding: 8px 12px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-sm); font-size: 0.75rem; color: #b45309;">
+                ⚠️ <strong>Model Disagreement:</strong> Classifiers produced conflicting predictions. Risk arbitration evaluated independent authentication &amp; intent evidence.
+              </div>
+            </div>
+
+            <div class="ml-disclaimer">Soft-voting ensemble (1/3 LR, 1/3 RF, 1/3 XGBoost) over n-gram TF-IDF. Predictions are arbitrated with header, URL, and pretext signals.</div>
           </div>
 
           <!-- Contextual NLP & Semantic Pretexting Radar -->
@@ -563,6 +636,18 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Queue Pagination & Counter Bar -->
+          <div class="queue-pagination-bar" id="queue-pagination-bar">
+            <div class="queue-count-info" id="queue-count-info">
+              Showing 0 of 0 cases
+            </div>
+            <div class="queue-pagination-controls">
+              <button type="button" class="btn-page-nav" id="btn-queue-prev" disabled>‹ Previous</button>
+              <span class="queue-page-indicator" id="queue-page-indicator">1 / 1</span>
+              <button type="button" class="btn-page-nav" id="btn-queue-next" disabled>Next ›</button>
+            </div>
           </div>
 
           <!-- Notes Modal -->

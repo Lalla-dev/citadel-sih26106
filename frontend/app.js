@@ -197,6 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return { text: '#f97316', bg: 'rgba(249, 115, 22, 0.15)', border: '#f97316' };
       case 'MEDIUM':
         return { text: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', border: '#f59e0b' };
+      case 'GUARDED':
+        return { text: '#2563eb', bg: 'rgba(37, 99, 235, 0.12)', border: '#2563eb' };
       default:
         return { text: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', border: '#10b981' };
     }
@@ -210,7 +212,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Show synthetic tag if it's one of the known research benchmark scenarios
     const syntheticTag = document.getElementById('synthetic-scenario-tag');
-    const isSample = ['benign_project_update.eml', 'credential_phishing_link.eml', 'bec_ceo_wire_fraud.eml', 'bec_invoice_bank_change.eml'].includes(data.filename);
+    const isSample = [
+      'benign_project_update.eml',
+      'credential_phishing_link.eml',
+      'bec_ceo_wire_fraud.eml',
+      'bec_invoice_bank_change.eml',
+      'ambiguous_vendor_security_notice.eml'
+    ].includes(data.filename);
     if (syntheticTag) {
       syntheticTag.style.display = isSample ? 'inline-block' : 'none';
     }
@@ -241,26 +249,48 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    // 2a. Evidence & Risk Arbitration Badge
+    const arb = data.risk_arbitration;
+    const arbBadge = document.getElementById('arbitration-badge');
+    if (arbBadge) {
+      if (arb && arb.signal_agreement) {
+        arbBadge.style.display = 'inline-flex';
+        const arbText = document.getElementById('arbitration-badge-text');
+        if (arbText) arbText.textContent = `Arbitration: ${arb.signal_agreement}`;
+        const arbRationale = document.getElementById('arbitration-tip-rationale');
+        if (arbRationale && arb.calibration_rationale) {
+          arbRationale.textContent = `Rationale: ${arb.calibration_rationale}`;
+        }
+      } else {
+        arbBadge.style.display = 'none';
+      }
+    }
+
     // 2b. ML Classification Card
     const ml = data.ml_classification || {};
     const mlStatusTag = document.getElementById('ml-status-tag');
     const mlLabelElem = document.getElementById('ml-predicted-label');
     const mlConfElem = document.getElementById('ml-confidence-val');
+    const agreeBadge = document.getElementById('ml-agreement-badge');
+    const voteLr = document.getElementById('vote-lr');
+    const voteRf = document.getElementById('vote-rf');
+    const voteXgb = document.getElementById('vote-xgb');
+    const disagreeAlert = document.getElementById('ml-disagreement-alert');
 
     if (ml.ml_available) {
-      mlStatusTag.textContent = 'ML Engine: Active';
+      mlStatusTag.textContent = 'Ensemble: Active (3 Models)';
       mlStatusTag.style.color = 'var(--color-clean)';
       mlStatusTag.style.borderColor = 'var(--color-clean)';
       mlStatusTag.style.background = 'var(--bg-clean)';
 
-      mlLabelElem.textContent = ml.predicted_label || '—';
+      mlLabelElem.textContent = (ml.predicted_label || '—').toUpperCase();
       const labelColors = {
         'phishing': 'var(--color-high)',
         'bec': 'var(--color-critical)',
         'benign': 'var(--color-clean)'
       };
       mlLabelElem.style.color = labelColors[ml.predicted_label] || 'var(--text-primary)';
-      mlConfElem.textContent = `${Math.round(ml.ml_confidence * 100)}%`;
+      mlConfElem.textContent = `${Math.round((ml.ml_confidence || 0) * 100)}%`;
 
       // Probability bars
       const probs = ml.probabilities || {};
@@ -269,6 +299,45 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(`prob-${cls}`).style.width = `${pct}%`;
         document.getElementById(`prob-${cls}-pct`).textContent = `${pct}%`;
       });
+
+      // Ensemble Agreement & Individual Model Votes
+      if (agreeBadge && ml.agreement_level) {
+        agreeBadge.textContent = `Consensus: ${ml.agreement_level}`;
+        if (ml.agreement_level === 'HIGH') {
+          agreeBadge.style.color = 'var(--color-clean)';
+          agreeBadge.style.background = 'var(--bg-clean)';
+          agreeBadge.style.border = '1px solid var(--border-clean)';
+        } else if (ml.agreement_level === 'MODERATE') {
+          agreeBadge.style.color = 'var(--color-high)';
+          agreeBadge.style.background = 'var(--bg-high)';
+          agreeBadge.style.border = '1px solid var(--border-high)';
+        } else {
+          agreeBadge.style.color = 'var(--color-critical)';
+          agreeBadge.style.background = 'var(--bg-critical)';
+          agreeBadge.style.border = '1px solid var(--border-critical)';
+        }
+      }
+
+      const models = ml.models || {};
+      const formatModelVote = (m) => {
+        if (!m || !m.predicted_label) return '—';
+        const label = m.predicted_label.toUpperCase();
+        const conf = Math.round((m.confidence || 0) * 100);
+        return `${label} (${conf}%)`;
+      };
+
+      if (voteLr) voteLr.textContent = formatModelVote(models.logistic_regression);
+      if (voteRf) voteRf.textContent = formatModelVote(models.random_forest);
+      if (voteXgb) voteXgb.textContent = formatModelVote(models.xgboost);
+
+      if (disagreeAlert) {
+        if (ml.agreement_level && ml.agreement_level !== 'HIGH') {
+          disagreeAlert.style.display = 'block';
+          disagreeAlert.innerHTML = `⚠️ <strong>Model Disagreement:</strong> ${escapeHtml(ml.agreement_detail || 'Models produced conflicting predictions')}. Risk arbitration evaluated independent authentication &amp; intent evidence.`;
+        } else {
+          disagreeAlert.style.display = 'none';
+        }
+      }
     } else {
       mlStatusTag.textContent = 'ML Engine: Unavailable';
       mlLabelElem.textContent = '—';
@@ -277,6 +346,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(`prob-${cls}`).style.width = '0%';
         document.getElementById(`prob-${cls}-pct`).textContent = '0%';
       });
+      if (agreeBadge) agreeBadge.textContent = 'Consensus: —';
+      if (voteLr) voteLr.textContent = '—';
+      if (voteRf) voteRf.textContent = '—';
+      if (voteXgb) voteXgb.textContent = '—';
+      if (disagreeAlert) disagreeAlert.style.display = 'none';
     }
 
     // 2c. Contextual NLP & Semantic Pretexting Radar (Phase 4)
@@ -571,6 +645,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Phase 7: SOC Incident Triage Queue & Case Management
   // -------------------------------------------------------------
   let activeNotesCaseId = null;
+  let currentQueueCases = [];
+  let queueCurrentPage = 1;
+  const QUEUE_PAGE_SIZE = 8;
+  let queueTotalStats = { total_cases: 0, critical_high: 0, investigating: 0, contained_resolved: 0 };
 
   function initCaseQueue() {
     const searchInput = document.getElementById('queue-search-input');
@@ -579,18 +657,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const refreshBtn = document.getElementById('btn-refresh-queue');
     const notesCloseBtn = document.getElementById('notes-modal-close');
     const saveNoteBtn = document.getElementById('btn-save-note');
+    const btnQueuePrev = document.getElementById('btn-queue-prev');
+    const btnQueueNext = document.getElementById('btn-queue-next');
 
     if (searchInput) {
       let debounceTimer;
       searchInput.addEventListener('input', () => {
         clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(loadCaseQueue, 250);
+        debounceTimer = setTimeout(() => loadCaseQueue(true), 250);
       });
     }
 
-    if (statusFilter) statusFilter.addEventListener('change', loadCaseQueue);
-    if (riskFilter) riskFilter.addEventListener('change', loadCaseQueue);
-    if (refreshBtn) refreshBtn.addEventListener('click', loadCaseQueue);
+    if (statusFilter) statusFilter.addEventListener('change', () => loadCaseQueue(true));
+    if (riskFilter) riskFilter.addEventListener('change', () => loadCaseQueue(true));
+    if (refreshBtn) refreshBtn.addEventListener('click', () => loadCaseQueue(true));
+
+    if (btnQueuePrev) {
+      btnQueuePrev.addEventListener('click', () => {
+        if (queueCurrentPage > 1) {
+          queueCurrentPage--;
+          renderQueuePage();
+          const wrap = document.querySelector('.queue-table-wrap');
+          if (wrap) wrap.scrollTop = 0;
+        }
+      });
+    }
+
+    if (btnQueueNext) {
+      btnQueueNext.addEventListener('click', () => {
+        const totalPages = Math.max(1, Math.ceil(currentQueueCases.length / QUEUE_PAGE_SIZE));
+        if (queueCurrentPage < totalPages) {
+          queueCurrentPage++;
+          renderQueuePage();
+          const wrap = document.querySelector('.queue-table-wrap');
+          if (wrap) wrap.scrollTop = 0;
+        }
+      });
+    }
 
     if (notesCloseBtn) {
       notesCloseBtn.addEventListener('click', () => {
@@ -620,7 +723,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (res.ok) {
             textElem.value = '';
             await openCaseNotes(activeNotesCaseId);
-            loadCaseQueue();
+            loadCaseQueue(false);
           } else {
             alert('Failed to save note.');
           }
@@ -634,13 +737,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function loadCaseQueue() {
+  async function loadCaseQueue(resetPage = true) {
     const searchInput = document.getElementById('queue-search-input');
     const statusFilter = document.getElementById('queue-status-filter');
     const riskFilter = document.getElementById('queue-risk-filter');
     const tbody = document.getElementById('queue-table-body');
 
     if (!tbody) return;
+
+    if (resetPage) {
+      queueCurrentPage = 1;
+    }
 
     const query = searchInput ? searchInput.value.trim() : '';
     const status = statusFilter ? statusFilter.value : 'ALL';
@@ -658,92 +765,143 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Update aggregate stat pills
       if (data.stats) {
+        queueTotalStats = data.stats;
         const s = data.stats;
-        document.getElementById('stat-total-cases').textContent = `Cases: ${s.total_cases}`;
-        document.getElementById('stat-critical-cases').textContent = `Critical/High: ${s.critical_high}`;
-        document.getElementById('stat-investigating-cases').textContent = `Active: ${s.investigating}`;
-        document.getElementById('stat-contained-cases').textContent = `Contained: ${s.contained_resolved}`;
+        const statTotal = document.getElementById('stat-total-cases');
+        const statCrit = document.getElementById('stat-critical-cases');
+        const statActive = document.getElementById('stat-investigating-cases');
+        const statCont = document.getElementById('stat-contained-cases');
+        if (statTotal) statTotal.textContent = `Cases: ${s.total_cases}`;
+        if (statCrit) statCrit.textContent = `Critical/High: ${s.critical_high}`;
+        if (statActive) statActive.textContent = `Active: ${s.investigating}`;
+        if (statCont) statCont.textContent = `Contained: ${s.contained_resolved}`;
       }
 
-      // Render table rows
-      tbody.innerHTML = '';
-      if (!data.cases || data.cases.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="queue-empty-msg">No cases match the current filter criteria.</td></tr>`;
-        return;
-      }
-
-      data.cases.forEach(c => {
-        const tr = document.createElement('tr');
-
-        const scoreClass = c.threat_score >= 80 ? 'risk-critical' : (c.threat_score >= 50 ? 'risk-high' : 'risk-low');
-        const formattedDate = c.created_at ? c.created_at.substring(11, 19) + ' UTC' : '-';
-
-        tr.innerHTML = `
-          <td><span class="queue-case-link" data-case-id="${escapeHtml(c.case_id)}">${escapeHtml(c.case_id)}</span></td>
-          <td style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary);">${formattedDate}</td>
-          <td>
-            <div style="font-weight: 600; color: #fff; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(c.subject)}</div>
-            <div style="font-size: 0.72rem; color: var(--text-muted); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(c.sender)}</div>
-          </td>
-          <td>
-            <strong class="${scoreClass}">${c.threat_score}/100</strong>
-            <span class="badge ${c.risk_level === 'CRITICAL' ? 'badge-fail' : (c.risk_level === 'HIGH' ? 'badge-warn' : 'badge-pass')}" style="margin-left: 4px;">${c.risk_level}</span>
-          </td>
-          <td><span style="font-size: 0.75rem; color: var(--text-secondary);">${escapeHtml(c.threat_archetype)}</span></td>
-          <td>
-            <select class="status-select-pill status-${c.status}" data-case-id="${escapeHtml(c.case_id)}">
-              <option value="NEW" ${c.status === 'NEW' ? 'selected' : ''}>NEW</option>
-              <option value="TRIAGED" ${c.status === 'TRIAGED' ? 'selected' : ''}>TRIAGED</option>
-              <option value="INVESTIGATING" ${c.status === 'INVESTIGATING' ? 'selected' : ''}>INVESTIGATING</option>
-              <option value="CONTAINED" ${c.status === 'CONTAINED' ? 'selected' : ''}>CONTAINED</option>
-              <option value="RESOLVED" ${c.status === 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>
-              <option value="FALSE_POSITIVE" ${c.status === 'FALSE_POSITIVE' ? 'selected' : ''}>FALSE POSITIVE</option>
-            </select>
-          </td>
-          <td style="font-size: 0.75rem; color: var(--text-secondary);">${escapeHtml(c.assigned_analyst || 'Unassigned')}</td>
-          <td>
-            <div class="queue-actions-cluster">
-              <button class="btn-queue-sm btn-inspect-case" data-case-id="${escapeHtml(c.case_id)}" title="Inspect full analysis on dashboard">🔍 Inspect</button>
-              <button class="btn-queue-sm btn-notes-case" data-case-id="${escapeHtml(c.case_id)}" title="View/add analyst notes">📝 Notes (${c.notes ? c.notes.length : 0})</button>
-              <button class="btn-queue-sm btn-dossier-case" data-case-id="${escapeHtml(c.case_id)}" title="Open Phase 8 Forensic Dossier">📄 Dossier</button>
-            </div>
-          </td>
-        `;
-
-        // Wire status change
-        const sel = tr.querySelector('.status-select-pill');
-        sel.addEventListener('change', async (e) => {
-          const newStatus = e.target.value;
-          sel.className = `status-select-pill status-${newStatus}`;
-          try {
-            await fetch(`/api/cases/${encodeURIComponent(c.case_id)}/status`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ status: newStatus })
-            });
-            loadCaseQueue();
-          } catch (err) {
-            alert('Failed to update status: ' + err.message);
-          }
-        });
-
-        // Wire inspect
-        tr.querySelector('.btn-inspect-case').addEventListener('click', () => inspectCase(c.case_id));
-        tr.querySelector('.queue-case-link').addEventListener('click', () => inspectCase(c.case_id));
-
-        // Wire notes
-        tr.querySelector('.btn-notes-case').addEventListener('click', () => openCaseNotes(c.case_id));
-
-        // Wire dossier
-        tr.querySelector('.btn-dossier-case').addEventListener('click', () => {
-          window.open(`/api/case/${encodeURIComponent(c.case_id)}/report`, '_blank');
-        });
-
-        tbody.appendChild(tr);
-      });
+      currentQueueCases = data.cases || [];
+      renderQueuePage();
     } catch (e) {
       console.error('Failed to load case queue:', e);
     }
+  }
+
+  function renderQueuePage() {
+    const tbody = document.getElementById('queue-table-body');
+    const countInfo = document.getElementById('queue-count-info');
+    const pageIndicator = document.getElementById('queue-page-indicator');
+    const btnPrev = document.getElementById('btn-queue-prev');
+    const btnNext = document.getElementById('btn-queue-next');
+    if (!tbody) return;
+
+    const totalCases = currentQueueCases.length;
+    const totalPages = Math.max(1, Math.ceil(totalCases / QUEUE_PAGE_SIZE));
+
+    if (queueCurrentPage > totalPages) queueCurrentPage = totalPages;
+    if (queueCurrentPage < 1) queueCurrentPage = 1;
+
+    const startIndex = (queueCurrentPage - 1) * QUEUE_PAGE_SIZE;
+    const endIndex = Math.min(startIndex + QUEUE_PAGE_SIZE, totalCases);
+    const pageCases = currentQueueCases.slice(startIndex, endIndex);
+
+    tbody.innerHTML = '';
+
+    if (totalCases === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" class="queue-empty-msg">No cases match the current filter criteria.</td></tr>`;
+      if (countInfo) countInfo.textContent = 'Showing 0 of 0 cases';
+      if (pageIndicator) pageIndicator.textContent = '1 / 1';
+      if (btnPrev) btnPrev.disabled = true;
+      if (btnNext) btnNext.disabled = true;
+      return;
+    }
+
+    pageCases.forEach(c => {
+      const tr = document.createElement('tr');
+
+      const scoreClass = c.threat_score >= 80 ? 'risk-critical' : (c.threat_score >= 50 ? 'risk-high' : 'risk-low');
+      const formattedDate = c.created_at ? c.created_at.substring(11, 19) + ' UTC' : '-';
+      const riskBadgeClass = c.risk_level === 'CRITICAL' ? 'badge-fail' : (c.risk_level === 'HIGH' ? 'badge-warn' : (c.risk_level === 'GUARDED' ? 'badge-guarded' : 'badge-pass'));
+
+      tr.innerHTML = `
+        <td><span class="queue-case-link" data-case-id="${escapeHtml(c.case_id)}">${escapeHtml(c.case_id)}</span></td>
+        <td style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary);">${formattedDate}</td>
+        <td>
+          <div style="font-weight: 600; color: var(--text-primary); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(c.subject)}</div>
+          <div style="font-size: 0.72rem; color: var(--text-tertiary); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(c.sender)}</div>
+        </td>
+        <td>
+          <strong class="${scoreClass}">${c.threat_score}/100</strong>
+          <span class="badge ${riskBadgeClass}" style="margin-left: 4px;">${c.risk_level}</span>
+        </td>
+        <td><span style="font-size: 0.75rem; color: var(--text-secondary);">${escapeHtml(c.threat_archetype)}</span></td>
+        <td>
+          <select class="status-select-pill status-${c.status}" data-case-id="${escapeHtml(c.case_id)}">
+            <option value="NEW" ${c.status === 'NEW' ? 'selected' : ''}>NEW</option>
+            <option value="TRIAGED" ${c.status === 'TRIAGED' ? 'selected' : ''}>TRIAGED</option>
+            <option value="INVESTIGATING" ${c.status === 'INVESTIGATING' ? 'selected' : ''}>INVESTIGATING</option>
+            <option value="CONTAINED" ${c.status === 'CONTAINED' ? 'selected' : ''}>CONTAINED</option>
+            <option value="RESOLVED" ${c.status === 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>
+            <option value="FALSE_POSITIVE" ${c.status === 'FALSE_POSITIVE' ? 'selected' : ''}>FALSE POSITIVE</option>
+          </select>
+        </td>
+        <td style="font-size: 0.75rem; color: var(--text-secondary);">${escapeHtml(c.assigned_analyst || 'Unassigned')}</td>
+        <td>
+          <div class="queue-actions-cluster">
+            <button class="btn-queue-sm btn-inspect-case" data-case-id="${escapeHtml(c.case_id)}" title="Inspect full analysis on dashboard">🔍 Inspect</button>
+            <button class="btn-queue-sm btn-notes-case" data-case-id="${escapeHtml(c.case_id)}" title="View/add analyst notes">📝 Notes (${c.notes ? c.notes.length : 0})</button>
+            <button class="btn-queue-sm btn-dossier-case" data-case-id="${escapeHtml(c.case_id)}" title="Open Phase 8 Forensic Dossier">📄 Dossier</button>
+          </div>
+        </td>
+      `;
+
+      // Wire status change
+      const sel = tr.querySelector('.status-select-pill');
+      sel.addEventListener('change', async (e) => {
+        const newStatus = e.target.value;
+        sel.className = `status-select-pill status-${newStatus}`;
+        try {
+          await fetch(`/api/cases/${encodeURIComponent(c.case_id)}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+          });
+          c.status = newStatus;
+          loadCaseQueue(false);
+        } catch (err) {
+          alert('Failed to update status: ' + err.message);
+        }
+      });
+
+      // Wire inspect
+      tr.querySelector('.btn-inspect-case').addEventListener('click', () => inspectCase(c.case_id));
+      tr.querySelector('.queue-case-link').addEventListener('click', () => inspectCase(c.case_id));
+
+      // Wire notes
+      tr.querySelector('.btn-notes-case').addEventListener('click', () => openCaseNotes(c.case_id));
+
+      // Wire dossier
+      tr.querySelector('.btn-dossier-case').addEventListener('click', () => {
+        window.open(`/api/case/${encodeURIComponent(c.case_id)}/report`, '_blank');
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    // Update pagination controls & counter
+    const currentCount = endIndex - startIndex;
+    const isFiltered = (queueTotalStats.total_cases > 0 && totalCases < queueTotalStats.total_cases);
+    if (countInfo) {
+      if (isFiltered) {
+        countInfo.textContent = `Showing ${currentCount} of ${totalCases} matching cases (${queueTotalStats.total_cases} total)`;
+      } else {
+        countInfo.textContent = `Showing ${currentCount} of ${totalCases} cases`;
+      }
+    }
+
+    if (pageIndicator) {
+      pageIndicator.textContent = `${queueCurrentPage} / ${totalPages}`;
+    }
+
+    if (btnPrev) btnPrev.disabled = (queueCurrentPage <= 1);
+    if (btnNext) btnNext.disabled = (queueCurrentPage >= totalPages);
   }
 
   async function inspectCase(caseId) {

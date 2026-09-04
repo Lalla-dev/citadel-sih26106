@@ -517,6 +517,16 @@ body {
   border: 1px solid var(--border-critical);
 }
 
+.sample-btn .badge.guarded {
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  border: 1px solid rgba(37, 99, 235, 0.28);
+}
+
+.sample-btn .citadel-tip {
+  margin-left: auto;
+}
+
 /* --------------------------------------------------------------------------
    Threat Verdict Hero Banner
    -------------------------------------------------------------------------- */
@@ -1252,11 +1262,37 @@ body {
 
 .queue-table-wrap {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 480px;
+  border: 1px solid var(--border-hairline);
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
+  background: var(--bg-card);
+  position: relative;
+}
+
+.queue-table-wrap::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.queue-table-wrap::-webkit-scrollbar-track {
+  background: var(--bg-subtle);
+}
+
+.queue-table-wrap::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 3px;
+}
+
+.queue-table-wrap::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
 }
 
 .queue-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 0.82rem;
 }
 
@@ -1269,12 +1305,20 @@ body {
   padding: 10px 14px;
   text-align: left;
   border-bottom: 1px solid var(--border-hairline);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  box-shadow: 0 1px 0 var(--border-hairline);
 }
 
 .queue-table td {
-  padding: 12px 14px;
+  padding: 11px 14px;
   border-bottom: 1px solid var(--border-hairline);
   vertical-align: middle;
+}
+
+.queue-table tr:last-child td {
+  border-bottom: none;
 }
 
 .queue-table tr:hover td {
@@ -1286,6 +1330,65 @@ body {
   padding: 32px !important;
   color: var(--text-tertiary);
   font-style: italic;
+}
+
+/* Queue Pagination Bar */
+.queue-pagination-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  border: 1px solid var(--border-hairline);
+  border-top: none;
+  background: var(--bg-subtle);
+  border-bottom-left-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.queue-count-info {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.queue-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-page-nav {
+  background: var(--bg-card);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-primary);
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-page-nav:hover:not(:disabled) {
+  background: #ffffff;
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-card);
+  color: var(--accent-blue);
+}
+
+.btn-page-nav:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.queue-page-indicator {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 60px;
+  text-align: center;
 }
 
 /* Playbook Actions Checklist */
