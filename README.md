@@ -1,4 +1,11 @@
-<img width="1919" height="1109" alt="image" src="https://github.com/user-attachments/assets/18fe1c46-3d9d-45f9-b0df-e046c1d3713f" />```markdown
+<img width="1919" height="1114" alt="image" src="https://github.com/user-attachments/assets/8c301890-3062-4a32-91cf-ad5358bb416a" />
+<img width="1919" height="1114" alt="image" src="https://github.com/user-attachments/assets/c413e897-4cd9-40b3-8d83-57bebbd4def7" />
+<img width="1919" height="1109" alt="image" src="https://github.com/user-attachments/assets/a74de93f-ee01-42ce-b80f-f35ef5858c92" />
+<img width="1919" height="1110" alt="image" src="https://github.com/user-attachments/assets/d95e82f4-633b-4e14-bcad-c34502a1d144" />
+<img width="1919" height="1114" alt="image" src="https://github.com/user-attachments/assets/21b486cb-6be7-4399-87dd-2a103283b59b" />
+<img width="1919" height="1113" alt="image" src="https://github.com/user-attachments/assets/a553e7d1-d9ac-4ff7-994a-132ad1b2f9f8" />
+<img width="1919" height="1115" alt="image" src="https://github.com/user-attachments/assets/87193e03-824f-454f-baea-326875fbe8b4" />
+<img width="1919" height="1115" alt="image" src="https://github.com/user-attachments/assets/25335d0d-17d3-432c-998c-eb592ee8e9f3" />```markdown
 # Citadel — AI-Powered Email Threat Detection, GeoLocation & Forensic Intelligence Platform
 SIH26106 · Smart India Hackathon (SIH 2026)
 
@@ -364,12 +371,5 @@ This README describes the Citadel prototype as presented in the provided project
 
 Thank you for reviewing Citadel — please see /docs/ and the project UI for guided walkthroughs and sample data for demonstrations.
 ```
-<img width="1919" height="1114" alt="image" src="https://github.com/user-attachments/assets/8c301890-3062-4a32-91cf-ad5358bb416a" />
-<img width="1919" height="1114" alt="image" src="https://github.com/user-attachments/assets/c413e897-4cd9-40b3-8d83-57bebbd4def7" />
-<img width="1919" height="1109" alt="image" src="https://github.com/user-attachments/assets/a74de93f-ee01-42ce-b80f-f35ef5858c92" />
-<img width="1919" height="1110" alt="image" src="https://github.com/user-attachments/assets/d95e82f4-633b-4e14-bcad-c34502a1d144" />
-<img width="1919" height="1114" alt="image" src="https://github.com/user-attachments/assets/21b486cb-6be7-4399-87dd-2a103283b59b" />
-<img width="1919" height="1113" alt="image" src="https://github.com/user-attachments/assets/a553e7d1-d9ac-4ff7-994a-132ad1b2f9f8" />
-<img width="1919" height="1115" alt="image" src="https://github.com/user-attachments/assets/87193e03-824f-454f-baea-326875fbe8b4" />
-<img width="1919" height="1115" alt="image" src="https://github.com/user-attachments/assets/25335d0d-17d3-432c-998c-eb592ee8e9f3" />
+
 
