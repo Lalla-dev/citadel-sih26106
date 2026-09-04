@@ -86,7 +86,7 @@ def health_check():
 
     return {
         "status": "operational",
-        "system": "Citadel Phase 2 MVP",
+        "system": "Citadel Email Threat Intelligence & Forensic Platform",
         "ml_engine": ml_status,
         "database_backend": db_backend
     }

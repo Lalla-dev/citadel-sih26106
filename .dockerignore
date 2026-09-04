@@ -1,0 +1,51 @@
+# Git version control
+.git
+.gitignore
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest and test suites
+.pytest_cache/
+.hypothesis/
+htmlcov/
+.coverage
+.coverage.*
+tests/
+
+# Local databases and persistence state
+*.db
+*.sqlite
+*.sqlite3
+citadel_persistence.db
+
+# Test run artifacts and verification scripts
+restart_test_state.json
+verify_restart_persistence.py
+
+# Environment variables and secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Editor and IDE metadata
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS temporary files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
