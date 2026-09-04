@@ -34,3 +34,13 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 .DS_Store
+
+# Local databases and persistence state
+*.db
+*.sqlite
+*.sqlite3
+citadel_persistence.db
+
+# Test run artifacts and state
+restart_test_state.json
+

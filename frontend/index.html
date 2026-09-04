@@ -636,7 +636,7 @@
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
               </svg>
               Cryptographic Evidence Integrity &amp; Merkle Evidence Ledger
-              <span class="citadel-tip tip-below" data-tip="merkle-ledger"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Merkle Evidence Ledger</span><p>An append-only chain of cryptographic blocks where each entry stores the SHA-256 hash of the evidence and links to the previous block.</p><p class="citadel-tip-why">Why it matters: Cryptographic hash links make unauthorized changes to the evidence or detection verdict detectable.</p><p class="citadel-tip-limitation">⚠️ Implementation Note: The current implementation is a local in-memory tamper-evident ledger for prototype verification, not a distributed blockchain.</p></span></span>
+              <span class="citadel-tip tip-below" data-tip="merkle-ledger"><span class="citadel-tip-icon">ⓘ</span><span class="citadel-tip-body"><span class="citadel-tip-title">Merkle Evidence Ledger</span><p>An append-only chain of cryptographic blocks where each entry stores the SHA-256 hash of the evidence and links to the previous block.</p><p class="citadel-tip-why">Why it matters: Cryptographic hash links make unauthorized changes to the evidence or detection verdict detectable.</p><p class="citadel-tip-limitation">⚠️ Implementation Note: The current implementation is a local persistent tamper-evident cryptographic ledger for prototype verification, not a distributed blockchain.</p></span></span>
             </h3>
             <div class="integrity-header-controls">
               <span class="integrity-badge badge-verified" id="integrity-status-badge">INTEGRITY: VERIFIED</span>

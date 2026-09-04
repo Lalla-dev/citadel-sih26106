@@ -1,6 +1,6 @@
 """
-Citadel Security Platform - Cryptographic Evidence Integrity & Blockchain Ledger (Phase 6 & 9)
-Provides tamper-evident chain of custody for digital email evidence:
+Citadel Security Platform - Cryptographic Evidence Integrity & Merkle Evidence Ledger (Phase 6 & 9)
+Provides append-only, tamper-evident cryptographic evidence anchoring backed by relational storage.
   1. SHA-256 hashing of original raw .eml RFC 5322 bytes (prior to any parsing).
   2. SHA-256 digest of relevant parsed headers and detection verdict.
   3. Append-only cryptographic/Merkle evidence ledger maintaining hash linkage.

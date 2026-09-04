@@ -10,9 +10,38 @@ import itertools
 
 # Thread-safe counter for readable case IDs
 _case_counter = itertools.count(1)
+_synced_from_db = False
+
+def sync_case_counter_from_db() -> None:
+    """Initializes or advances the case counter beyond any existing cases in the database."""
+    global _case_counter, _synced_from_db
+    try:
+        from backend.database import get_db_session, CaseModel
+        from sqlalchemy import select
+        with get_db_session() as session:
+            case_ids = session.execute(select(CaseModel.case_id)).scalars().all()
+            year = datetime.now(timezone.utc).year
+            prefix = f"CASE-{year}-"
+            max_num = 0
+            for cid in case_ids:
+                if cid.startswith(prefix):
+                    try:
+                        num = int(cid[len(prefix):])
+                        if num > max_num:
+                            max_num = num
+                    except ValueError:
+                        pass
+            if max_num > 0:
+                _case_counter = itertools.count(max_num + 1)
+        _synced_from_db = True
+    except Exception:
+        pass
 
 def generate_case_id() -> str:
     """Generate a human-readable case identifier e.g. CASE-2026-0001"""
+    global _synced_from_db
+    if not _synced_from_db:
+        sync_case_counter_from_db()
     year = datetime.now(timezone.utc).year
     return f"CASE-{year}-{next(_case_counter):04d}"
 

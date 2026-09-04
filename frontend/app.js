@@ -836,7 +836,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // -------------------------------------------------------------
-  // Phase 9: Cryptographic Evidence Integrity & Blockchain Ledger
+  // Phase 9: Cryptographic Evidence Integrity & Merkle Evidence Ledger
   // -------------------------------------------------------------
   function renderEvidenceIntegrity(data) {
     const integ = data.integrity || {};

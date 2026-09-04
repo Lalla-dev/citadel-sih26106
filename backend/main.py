@@ -60,11 +60,13 @@ SAMPLE_DESCRIPTIONS = {
 }
 
 from backend.database import init_db, get_active_backend
+from backend.schemas import sync_case_counter_from_db
 
 @app.on_event("startup")
 def on_startup():
-    """Initializes persistent database layer (PostgreSQL or SQLite fallback)."""
+    """Initializes persistent database layer (PostgreSQL or SQLite fallback) and syncs case counter."""
     init_db()
+    sync_case_counter_from_db()
 
 @app.get("/api/health")
 def health_check():

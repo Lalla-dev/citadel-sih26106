@@ -614,7 +614,7 @@ class CitadelDetectorOrchestrator:
         except Exception:
             result.threat_graph = {"nodes": [], "edges": [], "summary": {}}
 
-        # 10. Cryptographic Evidence Integrity & Blockchain Anchoring (Phase 9)
+        # 10. Cryptographic Evidence Integrity & Merkle Ledger Anchoring (Phase 9)
         try:
             from backend.integrity import get_evidence_ledger
             from backend.schemas import EvidenceIntegrity

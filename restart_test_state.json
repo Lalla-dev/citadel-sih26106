@@ -1,8 +1,0 @@
-{
-  "case_id": "CASE-2026-0003",
-  "threat_score": 100,
-  "threat_archetype": "CEO Fraud / Executive Spoofing",
-  "note_content": "Confirmed BEC attempt targeting CFO Robert. Wire payment halted.",
-  "evidence_sha256": "9eff076cab51329eed89cdcd89104714e1dab9b382b4dcc4cf968173c21b9c31",
-  "merkle_root": "3d75402c072f08176a62ae07f2f695817f823c9fb0d35c0956b4fd0c4a815cb0"
-}

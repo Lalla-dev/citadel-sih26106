@@ -151,26 +151,26 @@ def run_part_2():
     report_data = json.loads(json_body)
     assert report_data["case_identification"]["case_id"] == case_id
     assert report_data["case_identification"]["threat_score"] == state["threat_score"]
-    assert report_data["evidence_integrity"]["status"] == "INTEGRITY: VERIFIED"
+    assert report_data["evidence_integrity"]["integrity_status"] == "INTEGRITY: VERIFIED"
 
     # 8. Samples verification (Benign, Phishing, BEC)
     print("[Verifying Pipeline Endpoints & Samples Post-Restart]")
-    status, body = get("/api/sample/benign_internal_memo.eml")
+    status, body = get("/api/sample/benign_project_update.eml")
     assert status == 200
     benign = json.loads(body)
-    print(f" - Benign Sample: Score {benign['threat_score']}, Risk {benign['risk_level']}")
+    print(f" - Benign Sample ({benign['case_id']}): Score {benign['threat_score']}, Risk {benign['risk_level']}")
     assert benign["threat_score"] <= 35
 
-    status, body = get("/api/sample/phishing_credential_harvest.eml")
+    status, body = get("/api/sample/credential_phishing_link.eml")
     assert status == 200
     phish = json.loads(body)
-    print(f" - Phishing Sample: Score {phish['threat_score']}, Risk {phish['risk_level']}")
+    print(f" - Phishing Sample ({phish['case_id']}): Score {phish['threat_score']}, Risk {phish['risk_level']}")
     assert phish["threat_score"] >= 70
 
     status, body = get("/api/sample/bec_invoice_bank_change.eml")
     assert status == 200
     bec2 = json.loads(body)
-    print(f" - BEC Sample: Score {bec2['threat_score']}, Risk {bec2['risk_level']}")
+    print(f" - BEC Sample ({bec2['case_id']}): Score {bec2['threat_score']}, Risk {bec2['risk_level']}")
     assert bec2["threat_score"] >= 75
 
     print("=== ALL PROCESS-RESTART PERSISTENCE VERIFICATIONS PASSED SUCCESSFULLY! ===")
